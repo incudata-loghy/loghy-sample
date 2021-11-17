@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'loghy_id',
     ];
 
     /**
@@ -41,4 +42,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the Loghy history for the user.
+     */
+    public function loghyHistory()
+    {
+        return $this->hasMany(LoghyHistory::class);
+    }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserResource;
+use App\Models\LoghyHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class HomeController extends Controller
+class LoghyHistoryController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -21,15 +21,15 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return mixed
      */
-    public function index()
+    public function destroy(Request $request)
     {
-        $user = Auth::user();
+        $userId = Auth::id();
+        LoghyHistory::where('user_id', $userId)->delete();
 
-        $output = [
-            'user' => new UserResource($user),
-        ];
-        return view('home', compact('output'));
+        return redirect()
+            ->route('home')
+            ->with('success', 'Deleted loghy_history.');
     }
 }

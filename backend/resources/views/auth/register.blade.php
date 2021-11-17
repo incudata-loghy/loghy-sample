@@ -69,6 +69,19 @@
                             </div>
                         </div>
                     </form>
+                    <div id="loghy_button_container"></div>
+                    {{-- 
+                        TODO: Remove me when fixed bug that registURL of buttons-js is not work.
+                    --}}
+                    <a href="{{
+                        'https://api001.sns-loghy.jp/login/type/google/loghySample'
+                        . '?position=' . urlencode('#loghy_button_container')
+                        . '&beforeURL=' . urlencode(route('auth.loghy.callback.login'))
+                        . '&registURL=' . urlencode(route('auth.loghy.callback.register'))
+                        . '&errorURL=' . urlencode(route('auth.loghy.callback.error'))
+                    }}">
+                        Sign in with Google
+                    </a>
                 </div>
             </div>
         </div>

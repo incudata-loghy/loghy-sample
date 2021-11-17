@@ -65,6 +65,7 @@
                             </div>
                         </div>
                     </form>
+                    <div id="loghy_button_container"></div>
                 </div>
             </div>
         </div>
