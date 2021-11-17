@@ -42,7 +42,7 @@ class LoghyController extends Controller
         } catch (LoghyCallbackHandleException $e) {
             return $this->failRedirect($e->getMessage());
         } finally {
-            if ($loghyId) {
+            if (isset($loghyId)) {
                 Loghy::deleteUserInfo($loghyId);
             }
             $this->saveLoghyHistory();
@@ -72,7 +72,7 @@ class LoghyController extends Controller
         } catch (LoghyCallbackHandleException $e) {
             return $this->failRedirect($e->getMessage());
         } finally {
-            if ($loghyId) {
+            if (isset($loghyId)) {
                 Loghy::deleteUserInfo($loghyId);
             }
             $this->saveLoghyHistory();
@@ -179,7 +179,7 @@ class LoghyController extends Controller
             'id' => $userId, 'loghy_id' => $loghyId,
         ])->first();
 
-        if(!$user) {
+        if (!$user) {
             throw new LoghyCallbackHandleException('User not found with specified UserID(site_id) and LoghyID.');
         }
 
@@ -219,8 +219,12 @@ class LoghyController extends Controller
             function ($h) {
                 return [
                     'type' => $h['type'],
-                    'response_data' => json_encode($h['response_data']),
-                    'request_data' => json_encode($h['request_data']),
+                    'request_data' => $h['request_data'] === null
+                        ? null
+                        : json_encode($h['request_data']),
+                    'response_data' => $h['response_data'] === null
+                        ? null
+                        : json_encode($h['response_data']),
                 ];
             },
             Loghy::history()
