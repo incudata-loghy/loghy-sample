@@ -15,11 +15,8 @@ jobs:
       - name: Docker Version
         run: docker version
 
-      - name: Set environment
+      - name: Copy .env
         run: cp backend/.env.example backend/.env
-
-      - name: Generate app key
-        run: docker-compose exec -T app php artisan key:generate
 
       - name: Build Docker Images
         run: docker-compose build
@@ -43,6 +40,9 @@ jobs:
 
       - name: Laravel Version
         run: docker-compose exec -T app php artisan --version
+
+      - name: Generate key
+        run: docker-compose exec -T app php artisan key:generate
 
       - name: Laravel PHPUnit Testing
         run: docker-compose exec -T app php artisan test
