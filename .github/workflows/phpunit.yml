@@ -1,4 +1,4 @@
-name: laravel-create-project
+name: phpunit
 
 on:
   pull_request:
@@ -15,13 +15,14 @@ jobs:
       - name: Docker Version
         run: docker version
 
+      - name: Copy .env
+        run: cp backend/.env.example backend/.env
+
       - name: Build Docker Images
         run: docker-compose build
 
       - name: Create & Start Docker Containers
-        run: |
-          mkdir backend
-          docker-compose up -d
+        run: docker-compose up -d
 
       - name: OS Version
         run: |
@@ -34,20 +35,14 @@ jobs:
       - name: Composer Version
         run: docker-compose exec -T app composer --version
 
-      - name: Create Laravel Project
-        run: docker-compose exec -T app composer create-project --prefer-dist laravel/laravel .
+      - name: Composer Install
+        run: docker-compose exec -T app composer install
 
       - name: Laravel Version
         run: docker-compose exec -T app php artisan --version
 
-      - name: Laravel Migrate Testing
-        run: docker-compose exec -T app php artisan migrate
-
-      - name: Laravel Rollback Testing
-        run: docker-compose exec -T app php artisan migrate:refresh
-
-      - name: Laravel Seeding Testing
-        run: docker-compose exec -T app php artisan db:seed
+      - name: Generate key
+        run: docker-compose exec -T app php artisan key:generate
 
       - name: Laravel PHPUnit Testing
         run: docker-compose exec -T app php artisan test
