@@ -15,6 +15,9 @@ jobs:
       - name: Docker Version
         run: docker version
 
+      - name: Set environment
+        run: cp backend/.env.example backend/.env
+
       - name: Build Docker Images
         run: docker-compose build
 
