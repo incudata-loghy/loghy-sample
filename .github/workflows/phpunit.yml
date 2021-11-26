@@ -18,6 +18,9 @@ jobs:
       - name: Set environment
         run: cp backend/.env.example backend/.env
 
+      - name: Generate app key
+        run: docker-compose exec -T app php artisan key:generate
+
       - name: Build Docker Images
         run: docker-compose build
 
