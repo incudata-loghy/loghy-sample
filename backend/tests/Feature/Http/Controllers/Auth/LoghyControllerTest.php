@@ -26,15 +26,16 @@ class LoghyControllerTest extends TestCase
             ->assertSessionHas('error', 'LoghyID is not found in callback data.');
     }
 
-    // FIXME: When RegistURL of buttons-js was fixed
     public function testHandleLoginCallbackRedirectToRegisterWhenNoSiteId()
     {
         $request_data = [
-            'loghy_id' => $this->faker->randomDigitNot(0)
+            'lgid' => $this->faker->randomDigitNot(0)
         ];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
-        $response->assertRedirect(route('auth.loghy.callback.register'));
+        $response
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error', 'UserID(site_id) is not found in callback data.');
     }
 
     public function testHandleLoginCallbackRedirectToHomeWhenLoggedIn()
