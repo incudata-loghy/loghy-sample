@@ -21,11 +21,6 @@ class LoghyController extends Controller
      */
     public function handleLoginCallback(Request $request)
     {
-        // FIXME: Remove when fixed RegistURL
-        if (!$request->input('site_id')) {
-            return redirect()->route('auth.loghy.callback.register')->withInput();
-        }
-
         try {
             // TODO: Loghy からの callback であることを確認(Loghy側の実装待ち)
 
