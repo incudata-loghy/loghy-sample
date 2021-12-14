@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Lib\Loghy\Facades\Loghy;
 use App\Models\LoghyHistory;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class LoghyController extends Controller
@@ -21,11 +23,6 @@ class LoghyController extends Controller
      */
     public function handleLoginCallback(Request $request)
     {
-        // FIXME: Remove when fixed RegistURL
-        if (!$request->input('site_id')) {
-            return redirect()->route('auth.loghy.callback.register')->withInput();
-        }
-
         try {
             // TODO: Loghy からの callback であることを確認(Loghy側の実装待ち)
 
@@ -43,7 +40,7 @@ class LoghyController extends Controller
             return $this->failRedirect($e->getMessage());
         } finally {
             if (isset($loghyId)) {
-                Loghy::deleteUserInfo($loghyId);
+                $this->deleteUserInfo($loghyId);
             }
             $this->saveLoghyHistory();
         }
@@ -73,7 +70,7 @@ class LoghyController extends Controller
             return $this->failRedirect($e->getMessage());
         } finally {
             if (isset($loghyId)) {
-                Loghy::deleteUserInfo($loghyId);
+                $this->deleteUserInfo($loghyId);
             }
             $this->saveLoghyHistory();
         }
@@ -206,6 +203,22 @@ class LoghyController extends Controller
             ['email' => $email],
             ['name' => $name, 'password' => md5(Str::uuid()), 'loghy_id' => $loghyId]
         );
+    }
+
+    /**
+     * Delete user information in Loghy
+     * 
+     * @param string $loghyId
+     * @return bool
+     */
+    private function deleteUserInfo(string $loghyId): bool
+    {
+        try {
+            return Loghy::deleteUserInfo($loghyId);
+        } catch (Exception $e) {
+            Log::error("Failed to delete user information in Loghy. Its LoghyID is {$loghyId}");
+            return false;
+        }
     }
 
     /**
