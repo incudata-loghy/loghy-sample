@@ -1,0 +1,58 @@
+name: format
+
+on: push
+
+jobs:
+  php-cs-fixer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker Version
+        run: docker version
+
+      - name: Copy .env
+        run: cp backend/.env.example backend/.env
+
+      - name: Build Docker Images
+        run: docker-compose build
+
+      - name: Create & Start Docker Containers
+        run: docker-compose up -d
+
+      - name: OS Version
+        run: |
+          docker-compose exec -T app cat /etc/os-release
+          docker-compose exec -T app cat /etc/debian_version
+
+      - name: PHP Version
+        run: docker-compose exec -T app php --version
+
+      - name: Composer Version
+        run: docker-compose exec -T app composer --version
+
+      - name: Composer Install
+        run: docker-compose exec -T app composer install
+
+      - name: Laravel Version
+        run: docker-compose exec -T app php artisan --version
+
+      - name: Generate key
+        run: docker-compose exec -T app php artisan key:generate
+
+      - name: Execute PHP CS Fixer
+        run: docker compose exec app bash -c "./vendor/bin/php-cs-fixer fix ./ --using-cache=no"
+
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v4.2.0
+        with:
+          commit_message: pxp-cs-fixer by Github Actions
+
+      - name: Run if changes have been detected
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        run: echo "Changes!"
+
+      - name: Run if no changes have been detected
+        if: steps.auto-commit-action.outputs.changes_detected == 'false'
+        run: echo "No Changes!"
