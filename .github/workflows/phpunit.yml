@@ -1,9 +1,6 @@
 name: phpunit
 
-on:
-  pull_request:
-  schedule:
-    - cron:  '0 0 * * *'
+on: [push, pull_request]
 
 jobs:
   docker-build:
@@ -11,9 +8,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Docker Version
-        run: docker version
 
       - name: Copy .env
         run: cp backend/.env.example backend/.env
@@ -24,22 +18,8 @@ jobs:
       - name: Create & Start Docker Containers
         run: docker-compose up -d
 
-      - name: OS Version
-        run: |
-          docker-compose exec -T app cat /etc/os-release
-          docker-compose exec -T app cat /etc/debian_version
-
-      - name: PHP Version
-        run: docker-compose exec -T app php --version
-
-      - name: Composer Version
-        run: docker-compose exec -T app composer --version
-
       - name: Composer Install
         run: docker-compose exec -T app composer install
-
-      - name: Laravel Version
-        run: docker-compose exec -T app php artisan --version
 
       - name: Generate key
         run: docker-compose exec -T app php artisan key:generate
