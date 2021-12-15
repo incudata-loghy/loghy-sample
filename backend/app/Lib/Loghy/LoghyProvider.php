@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class LoghyProvider implements ProviderContract
 {
-    /** 
+    /**
      * Loghy API Key
      */
     protected ?string $apiKey;
@@ -36,7 +36,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Loghy Constructor.
-     * 
+     *
      * @param array $configuration
      */
     public function __construct(
@@ -51,7 +51,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Get user ID by Loghy ID.
      * LoghyID サイト別ユーザID変換.
-     * 
+     *
      * @param string $loghyId
      * @return null|string
      */
@@ -67,7 +67,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Get user information by Loghy ID.
      * LoghyID 個人情報取得
-     * 
+     *
      * @param string $loghyId
      * @return null|array
      */
@@ -83,7 +83,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Delete user information by Loghy ID.
      * LoghyID 指定個人情報削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -99,7 +99,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Delete user information by Loghy ID.
      * LoghyID 指定個人情報削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -115,7 +115,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Delete Loghy ID
      * LoghyID 指定データ削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -131,7 +131,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Merge users by Loghy ID.
      * LoghyID 指定データマージ
-     * 
+     *
      * @param string $targetLoghyId
      * @param string $sourceLoghyId
      * @return bool
@@ -147,7 +147,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Get request data to Loghy
-     * 
+     *
      * @return null|array
      */
     public function requestData(): ?array
@@ -157,7 +157,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Get response data from Loghy
-     * 
+     *
      * @return null|array
      */
     public function responseData(): ?array
@@ -167,7 +167,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Request to Loghy
-     * 
+     *
      * @param string $command
      * @param string $id
      * @param null|string $mid
@@ -209,7 +209,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Get url to request Loghy
-     * 
+     *
      * @return string
      */
     private function getUrl($command): string
@@ -219,7 +219,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Get communication history with Loghy
-     * 
+     *
      * @return array
      */
     public function history(): array
@@ -229,7 +229,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Append callback data to history.
-     * 
+     *
      * @param string $type
      * @param array $input
      * @return void
@@ -245,7 +245,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Append request & response data to history
-     * 
+     *
      * @param string $command
      * @return void
      */
@@ -260,11 +260,12 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Convert command to type that describe communication with Loghy.
-     * 
+     *
      * @param string $command
      * @return string
      */
-    private function convertCmdToType($command) {
+    private function convertCmdToType($command)
+    {
         $types = [
             'lgid2siteid' => 'Get user ID by Loghy ID',
             'lgid2get' => 'Get user information by Loghy ID',

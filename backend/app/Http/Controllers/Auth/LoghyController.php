@@ -17,7 +17,7 @@ class LoghyController extends Controller
 {
     /**
      * Handle callback from Loghy without site_id on successful SNS login.
-     * 
+     *
      * @param Request $request
      * @return mixed
      */
@@ -48,7 +48,7 @@ class LoghyController extends Controller
 
     /**
      * Handle callback from Loghy with site_id on successful SNS login.
-     * 
+     *
      * @param Request $request
      * @return mixed
      */
@@ -78,7 +78,7 @@ class LoghyController extends Controller
 
     /**
      * Handle callback from Loghy on failed SNS login.
-     * 
+     *
      * @param Request $request
      * @return mixed
      */
@@ -89,7 +89,7 @@ class LoghyController extends Controller
 
     /**
      * Get LoghyID from request.
-     * 
+     *
      * @param Request $request
      * @return string $loghyId
      * @throws LoghyCallbackHandleException
@@ -106,7 +106,7 @@ class LoghyController extends Controller
 
     /**
      * Get UserID (site_id) from request.
-     * 
+     *
      * @param Request $request
      * @return string $loghyId
      * @throws LoghyCallbackHandleException
@@ -124,7 +124,7 @@ class LoghyController extends Controller
 
     /**
      * Connect LoghyID.
-     * 
+     *
      * @param string $loghyId
      * @return User
      * @throws LoghyCallbackHandleException
@@ -141,7 +141,7 @@ class LoghyController extends Controller
 
     /**
      * Register user.
-     * 
+     *
      * @param string $loghyId
      * @return User
      * @throws LoghyCallbackHandleException
@@ -165,7 +165,7 @@ class LoghyController extends Controller
 
     /**
      * Find user.
-     * 
+     *
      * @param string $loghyId
      * @return User
      * @throws LoghyCallbackHandleException
@@ -185,7 +185,7 @@ class LoghyController extends Controller
 
     /**
      * Create user.
-     * 
+     *
      * @param array $userInfo
      * @param string $loghyId
      * @return User
@@ -207,7 +207,7 @@ class LoghyController extends Controller
 
     /**
      * Delete user information in Loghy
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -223,7 +223,7 @@ class LoghyController extends Controller
 
     /**
      * Save Loghy history.
-     * 
+     *
      * @return void
      */
     private function saveLoghyHistory()
@@ -255,7 +255,7 @@ class LoghyController extends Controller
 
     /**
      * Redirect home with login and success message.
-     * 
+     *
      * @param User $user
      * @param string $message
      * @return mixed
@@ -270,7 +270,7 @@ class LoghyController extends Controller
 
     /**
      * Redirect with error message.
-     * 
+     *
      * @param string $message
      * @return mixed
      */
