@@ -3,7 +3,7 @@
 namespace App\Lib\Loghy;
 
 use App\Lib\Loghy\Contracts\Provider as ProviderContract;
-use Exception;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class LoghyProvider implements ProviderContract
@@ -59,7 +59,7 @@ class LoghyProvider implements ProviderContract
     {
         $command = 'lgid2siteid';
 
-        $response = $this->request($command, $loghyId);
+        $response = $this->requestApi($command, $loghyId);
 
         return $response->json('data.site_id');
     }
@@ -75,7 +75,7 @@ class LoghyProvider implements ProviderContract
     {
         $command = 'lgid2get';
 
-        $response = $this->request($command, $loghyId);
+        $response = $this->requestApi($command, $loghyId);
 
         return $response->json('data.personal_data');
     }
@@ -91,7 +91,7 @@ class LoghyProvider implements ProviderContract
     {
         $command = 'lgid2set';
 
-        $response = $this->request($command, $loghyId, $userId);
+        $response = $this->requestApi($command, $loghyId, $userId);
 
         return $response->json('result', false);
     }
@@ -107,7 +107,7 @@ class LoghyProvider implements ProviderContract
     {
         $command = 'lgid2pdel';
 
-        $response = $this->request($command, $loghyId);
+        $response = $this->requestApi($command, $loghyId);
 
         return $response->json('result', false);
     }
@@ -123,7 +123,7 @@ class LoghyProvider implements ProviderContract
     {
         $command = 'lgid2del';
 
-        $response = $this->request($command, $loghyId);
+        $response = $this->requestApi($command, $loghyId);
 
         return $response->json('result', false);
     }
@@ -140,40 +140,45 @@ class LoghyProvider implements ProviderContract
     {
         $command = 'lgid2merge';
 
-        $response = $this->request($command, $targetLoghyId, $sourceLoghyId);
+        $response = $this->requestApi($command, $targetLoghyId, $sourceLoghyId);
 
         return $response->json('result', false);
     }
 
     /**
-     * Get request data to Loghy
+     * Get Loghy ID and User ID by authentication code.
+     * LoghyID取得
      * 
-     * @return null|array
+     * @param string $code
+     * @return array
      */
-    public function requestData(): ?array
+    public function getLoghyId(string $code): array
     {
-        return $this->requestData;
+        $command = 'loghyid';
+        $url = $this->getUrl($command);
+
+        $requestData = [ 'code' => $code ];
+        $response = Http::post($url, $requestData);
+
+        $responseData = $response->json();
+        $this->appendHistory($command, $requestData, $responseData);
+
+        $this->verifyResponse($response);
+        return [
+            'loghyId' => $response->json('data.lgid'),
+            'userId' => $response->json('data.site_id'),
+        ];
     }
 
     /**
-     * Get response data from Loghy
-     * 
-     * @return null|array
-     */
-    public function responseData(): ?array
-    {
-        return $this->responseData;
-    }
-
-    /**
-     * Request to Loghy
+     * Request to Loghy API
      * 
      * @param string $command
      * @param string $id
      * @param null|string $mid
      * @return \Illuminate\Http\Client\Response
      */
-    private function request(string $command, string $id, ?string $mid = null)
+    private function requestApi(string $command, string $id, ?string $mid = null): Response
     {
         $atype = 'site';
         $time = now()->getTimestamp();
@@ -181,7 +186,7 @@ class LoghyProvider implements ProviderContract
         $joined = $command . $atype . $this->siteCode . $id . $mid . $time . $this->apiKey;
         $skey = hash('sha256', $joined);
 
-        $this->requestData = [
+        $requestData = [
             'cmd' => $command,
             'atype' => $atype,
             'sid' => $this->siteCode,
@@ -192,19 +197,31 @@ class LoghyProvider implements ProviderContract
         ];
 
         $url = $this->getUrl($command);
-        $response = Http::get($url, $this->requestData);
+        $response = Http::get($url, $requestData);
 
-        $this->responseData = $response->json();
-        $this->appendHistory($command);
+        $responseData = $response->json();
+        $this->appendHistory($command, $requestData, $responseData);
 
+        $this->verifyResponse($response);
+        return $response;
+    }
+
+    /**
+     * Verify response.
+     * 
+     * @param Illuminate\Http\Client\Response $response
+     * @return bool
+     * @throws \Exception
+     */
+    private function verifyResponse(Response $response): bool
+    {
         if (!$response->ok()) {
-            throw new Exception('Response status code is not ok from Loghy.', $response->status());
+            throw new \Exception('Response status code is not ok from Loghy.', $response->status());
         }
         if ($response->json('result') !== true) {
-            throw new Exception('Response result is not true. ', $response->json('error_code'));
+            throw new \Exception('Response result is not true. ', $response->json('error_code'));
         }
-
-        return $response;
+        return true;
     }
 
     /**
@@ -247,14 +264,16 @@ class LoghyProvider implements ProviderContract
      * Append request & response data to history
      * 
      * @param string $command
+     * @param array $requestData
+     * @param array $responseData
      * @return void
      */
-    private function appendHistory($command)
+    private function appendHistory(string $command, array $requestData, array $responseData): void
     {
         $this->history[] = [
             'type' => $this->convertCmdToType($command),
-            'request_data' => $this->requestData(),
-            'response_data' => $this->responseData(),
+            'request_data' => $requestData,
+            'response_data' => $responseData,
         ];
     }
 
@@ -264,7 +283,8 @@ class LoghyProvider implements ProviderContract
      * @param string $command
      * @return string
      */
-    private function convertCmdToType($command) {
+    private function convertCmdToType(string $command): string
+    {
         $types = [
             'lgid2siteid' => 'Get user ID by Loghy ID',
             'lgid2get' => 'Get user information by Loghy ID',
@@ -272,6 +292,7 @@ class LoghyProvider implements ProviderContract
             'lgid2set' => 'Put user ID by Loghy ID',
             'lgid2del' => 'Delete Loghy ID',
             'lgid2merge' => 'Merge user by Loghy ID',
+            'loghyid' => 'Get Loghy ID by authentication code',
         ];
 
         return $types[$command] ?? '';

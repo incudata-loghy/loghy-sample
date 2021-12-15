@@ -61,18 +61,13 @@ interface Provider
     public function mergeUser(string $targetLoghyId, string $sourceLoghyId): bool;
 
     /**
-     * Get request data to Loghy.
+     * Get Loghy ID and User ID by authentication code.
+     * LoghyID取得
      * 
-     * @return null|array
+     * @param string $code
+     * @return array
      */
-    public function requestData(): ?array;
-
-    /**
-     * Get response data from Loghy.
-     * 
-     * @return null|array
-     */
-    public function responseData(): ?array;
+    public function getLoghyId(string $code): array;
 
     /**
      * Append callback data to history.
