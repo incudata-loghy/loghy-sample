@@ -1,0 +1,45 @@
+name: static-analysis
+
+on: pull_request
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker Version
+        run: docker version
+
+      - name: Copy .env
+        run: cp backend/.env.example backend/.env
+
+      - name: Build Docker Images
+        run: docker-compose build
+
+      - name: Create & Start Docker Containers
+        run: docker-compose up -d
+
+      - name: OS Version
+        run: |
+          docker-compose exec -T app cat /etc/os-release
+          docker-compose exec -T app cat /etc/debian_version
+
+      - name: PHP Version
+        run: docker-compose exec -T app php --version
+
+      - name: Composer Version
+        run: docker-compose exec -T app composer --version
+
+      - name: Composer Install
+        run: docker-compose exec -T app composer install
+
+      - name: Laravel Version
+        run: docker-compose exec -T app php artisan --version
+
+      - name: Generate key
+        run: docker-compose exec -T app php artisan key:generate
+
+      - name: Execute PHPStan(Larastan)
+        run: docker compose exec app bash -c "./vendor/bin/phpstan analyse app tests"

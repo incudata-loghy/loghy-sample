@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class LoghyProvider implements ProviderContract
 {
-    /** 
+    /**
      * Loghy API Key
      */
     protected ?string $apiKey;
@@ -36,7 +36,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Loghy Constructor.
-     * 
+     *
      * @param array $configuration
      */
     public function __construct(
@@ -51,7 +51,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Get user ID by Loghy ID.
      * LoghyID サイト別ユーザID変換.
-     * 
+     *
      * @param string $loghyId
      * @return null|string
      */
@@ -67,7 +67,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Get user information by Loghy ID.
      * LoghyID 個人情報取得
-     * 
+     *
      * @param string $loghyId
      * @return null|array
      */
@@ -83,7 +83,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Delete user information by Loghy ID.
      * LoghyID 指定個人情報削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -99,7 +99,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Delete user information by Loghy ID.
      * LoghyID 指定個人情報削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -115,7 +115,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Delete Loghy ID
      * LoghyID 指定データ削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -131,7 +131,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Merge users by Loghy ID.
      * LoghyID 指定データマージ
-     * 
+     *
      * @param string $targetLoghyId
      * @param string $sourceLoghyId
      * @return bool
@@ -226,7 +226,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Get url to request Loghy
-     * 
+     *
      * @return string
      */
     private function getUrl($command): string
@@ -236,7 +236,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Get communication history with Loghy
-     * 
+     *
      * @return array
      */
     public function history(): array
@@ -246,7 +246,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Append callback data to history.
-     * 
+     *
      * @param string $type
      * @param array $input
      * @return void
@@ -262,7 +262,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Append request & response data to history
-     * 
+     *
      * @param string $command
      * @param array $requestData
      * @param array $responseData
@@ -279,7 +279,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Convert command to type that describe communication with Loghy.
-     * 
+     *
      * @param string $command
      * @return string
      */

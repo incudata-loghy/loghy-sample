@@ -7,7 +7,7 @@ interface Provider
     /**
      * Get user ID by Loghy ID.
      * LoghyID サイト別ユーザID変換.
-     * 
+     *
      * @param string $loghyId
      * @return null|string
      */
@@ -16,7 +16,7 @@ interface Provider
     /**
      * Get user information by Loghy ID.
      * LoghyID 個人情報取得
-     * 
+     *
      * @param string $loghyId
      * @return null|array
      */
@@ -25,7 +25,7 @@ interface Provider
     /**
      * Put user ID by Loghy ID.
      * LoghyID サイト別ユーザID設定
-     * 
+     *
      * @param string $loghyId
      * @param string $userId
      * @return bool
@@ -35,7 +35,7 @@ interface Provider
     /**
      * Delete user information by Loghy ID.
      * LoghyID 指定個人情報削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -44,7 +44,7 @@ interface Provider
     /**
      * Delete Loghy ID
      * LoghyID 指定データ削除
-     * 
+     *
      * @param string $loghyId
      * @return bool
      */
@@ -53,7 +53,7 @@ interface Provider
     /**
      * Merge users by Loghy ID.
      * LoghyID 指定データマージ
-     * 
+     *
      * @param string $targetLoghyId
      * @param string $sourceLoghyId
      * @return bool
@@ -71,7 +71,7 @@ interface Provider
 
     /**
      * Append callback data to history.
-     * 
+     *
      * @param string $type
      * @param array $input
      * @return void
@@ -80,7 +80,7 @@ interface Provider
 
     /**
      * Get communication history with Loghy
-     * 
+     *
      * @return array
      */
     public function history(): array;

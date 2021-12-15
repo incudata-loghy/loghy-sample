@@ -1,12 +1,9 @@
-name: phpunit
+name: test
 
-on:
-  pull_request:
-  schedule:
-    - cron:  '0 0 * * *'
+on: pull_request
 
 jobs:
-  docker-build:
+  phpunit:
     runs-on: ubuntu-latest
 
     steps:
