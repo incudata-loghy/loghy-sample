@@ -131,3 +131,5 @@ ide-helper:
 	docker compose exec app php artisan ide-helper:models --nowrite
 lint:
 	docker compose exec app bash -c "./vendor/bin/php-cs-fixer fix ./ --using-cache=no"
+phpstan:
+	docker compose exec app bash -c "./vendor/bin/phpstan analyse app tests"
