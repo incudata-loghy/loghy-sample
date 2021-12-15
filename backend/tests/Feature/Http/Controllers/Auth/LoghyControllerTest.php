@@ -103,7 +103,7 @@ class LoghyControllerTest extends TestCase
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
-        
+
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
@@ -128,7 +128,7 @@ class LoghyControllerTest extends TestCase
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
-        
+
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
@@ -152,7 +152,7 @@ class LoghyControllerTest extends TestCase
             ->once()
             ->with($request_data['lgid'])
             ->andThrow(new Exception());
-        
+
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response->assertStatus(500);

@@ -5,7 +5,6 @@ namespace App\Lib\Loghy\Facades;
 use App\Lib\Loghy\LoghyProvider;
 use Illuminate\Support\Facades\Facade;
 
-
 /**
  * @method static ?string getUserId(string $loghyId)
  * @method static ?array getUserInfo(string $loghyId)
