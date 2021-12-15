@@ -63,7 +63,7 @@ interface Provider
     /**
      * Get Loghy ID and User ID by authentication code.
      * LoghyID取得
-     * 
+     *
      * @param string $code
      * @return array
      */

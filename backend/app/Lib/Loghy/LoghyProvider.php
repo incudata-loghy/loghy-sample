@@ -148,7 +148,7 @@ class LoghyProvider implements ProviderContract
     /**
      * Get Loghy ID and User ID by authentication code.
      * LoghyID取得
-     * 
+     *
      * @param string $code
      * @return array
      */
@@ -172,7 +172,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Request to Loghy API
-     * 
+     *
      * @param string $command
      * @param string $id
      * @param null|string $mid
@@ -208,7 +208,7 @@ class LoghyProvider implements ProviderContract
 
     /**
      * Verify response.
-     * 
+     *
      * @param Illuminate\Http\Client\Response $response
      * @return bool
      * @throws \Exception

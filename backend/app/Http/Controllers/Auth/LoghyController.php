@@ -14,7 +14,8 @@ use Illuminate\Support\Str;
 
 class LoghyController extends Controller
 {
-    private ?string $loghyId, $userId;
+    private ?string $loghyId;
+    private ?string $userId;
 
     /**
      * Handle callback from Loghy without site_id on successful SNS login.
@@ -28,7 +29,7 @@ class LoghyController extends Controller
             Loghy::appendCallbackHistory('login_callback', $request->input());
 
             // Set $loghyId to call deleteUserInfo
-            $loghyId = $this->getLoghyId($request); 
+            $loghyId = $this->getLoghyId($request);
             if (Auth::check()) {
                 // There is no case that LoghyID,UserID in request and LoghyID,UserID user logged in is same
                 return $this->successRedirect(Auth::user(), 'Already connected 👍');
@@ -117,14 +118,14 @@ class LoghyController extends Controller
 
     /**
      * Get LoghyID and UserID from authentication code in request.
-     * 
+     *
      * @param Request $request
      * @return array ['loghyId' => $loghyId, 'userId' => $userId]
      * @throws LoghyCallbackHandleException
      */
     private function getIdsByCode(Request $request): array
     {
-        $code = $request->input('code') 
+        $code = $request->input('code')
             ?? throw new LoghyCallbackHandleException('Authentication code is not found in callback data.');
 
         try {
@@ -134,7 +135,6 @@ class LoghyController extends Controller
             $this->userId = $ids['userId'] ?? null;
 
             return $ids;
-
         } catch (\Exception $e) {
             throw new LoghyCallbackHandleException('Failed to get LoghyID by authentication code.', 0, $e);
         }
