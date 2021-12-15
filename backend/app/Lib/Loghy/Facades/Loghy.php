@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool deleteUserInfo(string $loghyId)
  * @method static bool deleteLoghyId(string $loghyId)
  * @method static bool mergeUser(string $targetLoghyId, string $sourceLoghyId)
+ * @method static array getLoghyId(string $code)
  * @method static ?array requestData()
  * @method static ?array responseData()
  * @method static void appendCallbackHistory(string $type, array $input)

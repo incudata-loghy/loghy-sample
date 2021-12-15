@@ -94,6 +94,25 @@ class LoghyProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testGetLoghyIdReturnLoghyIdAndSiteId()
+    {
+        Http::fake(Http::response([
+            'result' => true,
+            'data' => [
+                'lgid' => '1',
+                'site_id' => '11',
+                'social_login' => 'google',
+                'sid' => $this->faker()->uuid(),
+                'geturl' => $this->faker()->url(),
+            ],
+        ]));
+
+        $result = $this->provider->getLoghyId('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
+        $this->assertSame('1', $result['loghyId']);
+        $this->assertSame('11', $result['userId']);
+    }
+
     public function testGetUserIdThrowsExceptionWhenStatusCodeIsBadRequest()
     {
         $this->expectException(\Exception::class);

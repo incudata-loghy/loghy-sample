@@ -4,9 +4,9 @@ namespace Tests\Feature\Http\Controllers\Auth;
 
 use App\Lib\Loghy\Facades\Loghy;
 use App\Models\User;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class LoghyControllerTest extends TestCase
@@ -19,18 +19,22 @@ class LoghyControllerTest extends TestCase
         $user = User::factory()->create([
             'loghy_id' => $this->faker->randomDigitNot(0)
         ]);
-        $request_data = [
-            'site_id' => $user->id,
-            'lgid' => $user->loghy_id,
-        ];
 
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => $user->loghy_id,
+                'userId' => $user->id,
+            ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with($user->loghy_id)
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
@@ -40,20 +44,23 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleLoginCallbackRedirectToHomeWhenLoggedIn()
     {
-        $request_data = [
-            'site_id' => $this->faker->randomDigitNot(0),
-            'lgid' => $this->faker->randomDigitNot(0),
-        ];
-
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => '11',
+                'userId' => '1',
+            ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with('11')
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         /** @var User $user */
         $user = User::factory()->create();
+        $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
         $response = $this->actingAs($user)
             ->call('GET', route('auth.loghy.callback.login'), $request_data);
 
@@ -62,28 +69,70 @@ class LoghyControllerTest extends TestCase
             ->assertSessionHas('success', 'Already connected 👍');
     }
 
-    public function testHandleLoginCallbackRedirectToRegisterWhenNoLoghyId()
+    public function testHandleLoginRedirectToRegisterWhenNoCode()
     {
-        $request_data = [
-            'site_id' => $this->faker->randomDigitNot(0)
-        ];
+        $response = $this->call('GET', route('auth.loghy.callback.login'), []);
+
+        $response
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error', 'Authentication code is not found in callback data.');
+    }
+
+    public function testHandleLoginCallbackRedirectToRegisterWhenFailedToGetLoghyIdByCode()
+    {
+        Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andThrows(new \Exception());
+        Loghy::shouldReceive('history')->once()->andReturn([]);
+
+        $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
             ->assertRedirect(route('register'))
-            ->assertSessionHas('error', 'LoghyID is not found in callback data.');
+            ->assertSessionHas('error', 'Failed to get LoghyID by authentication code.');
+    }
+
+    public function testHandleLoginCallbackRedirectToRegisterWhenNoLoghyId()
+    {
+        Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => null,
+                'userId' => '1'
+            ]);
+        Loghy::shouldReceive('history')->once()->andReturn([]);
+
+        $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
+        $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
+
+        $response
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error', 'Failed to get LoghyID by authentication code.');
     }
 
     public function testHandleLoginCallbackRedirectToRegisterWhenNoSiteId()
     {
-        $request_data = [
-            'lgid' => $this->faker->randomDigitNot(0)
-        ];
+        Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->twice()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => '11',
+                'userId' => null,
+            ]);
+        Loghy::shouldReceive('history')->once()->andReturn([]);
+
+        $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
             ->assertRedirect(route('register'))
-            ->assertSessionHas('error', 'UserID(site_id) is not found in callback data.');
+            ->assertSessionHas('error', 'Failed to get UserID(site_id) by authentication code.');
     }
 
     public function testHandleLoginCallbackRedirectToRegisterWhenInvalidLoghyId()
@@ -91,19 +140,22 @@ class LoghyControllerTest extends TestCase
         $user = User::factory()->create([
             'loghy_id' => $this->faker->randomDigitNot(0)
         ]);
-        $request_data = [
-            'site_id' => $user->id,
-            'lgid' => $user->loghy_id + 1,
-        ];
 
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => $user->loghy_id + 1,
+                'userId' => $user->id,
+            ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with($user->loghy_id + 1)
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
-
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
@@ -116,19 +168,22 @@ class LoghyControllerTest extends TestCase
         $user = User::factory()->create([
             'loghy_id' => $this->faker->randomDigitNot(0)
         ]);
-        $request_data = [
-            'site_id' => $user->id + 1,
-            'lgid' => $user->loghy_id,
-        ];
 
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => $user->loghy_id,
+                'userId' => $user->id + 1,
+            ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with($user->loghy_id)
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
-
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
@@ -136,49 +191,63 @@ class LoghyControllerTest extends TestCase
             ->assertSessionHas('error', 'User not found with specified UserID(site_id) and LoghyID.');
     }
 
-    // TODO: fix 500
-    public function testHandleLoginCallback500WhenThrowsException()
+    public function testHandleLoginCallbackRedirectToHomeAndErrorLogIsOutputWhenThrowsException()
     {
         $user = User::factory()->create([
             'loghy_id' => $this->faker->randomDigitNot(0)
         ]);
-        $request_data = [
-            'site_id' => $user->id,
-            'lgid' => $user->loghy_id,
-        ];
 
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => $user->loghy_id,
+                'userId' => $user->id,
+            ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
-            ->andThrow(new Exception());
+            ->with($user->loghy_id)
+            ->andThrow(new \Exception());
+        Loghy::shouldReceive('history')->once()->andReturn([]);
 
+        Log::shouldReceive('error')
+            ->once()
+            ->with("Failed to delete user information in Loghy. Its LoghyID is {$user->loghy_id}");
+
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->call('GET', route('auth.loghy.callback.login'), $request_data);
 
-        $response->assertStatus(500);
+        $response
+            ->assertRedirect(route('home'))
+            ->assertSessionHas('success', 'Logged in 🎉');
     }
 
     public function testHandleRegisterCallbackCreateUserAndRedirectToHomeWhenNotLoggedIn()
     {
-        $request_data = [
-            'lgid' => $this->faker->randomDigitNot(0)
-        ];
-
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => '11',
+                'userId' => null,
+            ]);
         Loghy::shouldReceive('getUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with('11')
             ->andReturn([
                 'name' => $this->faker()->name(),
                 'email' => $this->faker()->email(),
             ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with('11')
             ->andReturn(true);
         Loghy::shouldReceive('putUserId')->once()->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->call('GET', route('auth.loghy.callback.register'), $request_data);
 
         $response
@@ -187,36 +256,58 @@ class LoghyControllerTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
+    public function testHandleRegisterRedirectToRegisterWhenNoCode()
+    {
+        $response = $this->call('GET', route('auth.loghy.callback.register'), []);
+
+        $response
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error', 'Authentication code is not found in callback data.');
+    }
+
     public function testHandleRegisterCallbackRedirectToRegisterWhenNoLoghyId()
     {
-        $request_data = [];
+        Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => null,
+                'userId' => null,
+            ]);
+        Loghy::shouldReceive('history')->once()->andReturn([]);
+
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->call('GET', route('auth.loghy.callback.register'), $request_data);
 
         $response
             ->assertRedirect(route('register'))
-            ->assertSessionHas('error', 'LoghyID is not found in callback data.');
+            ->assertSessionHas('error', 'Failed to get LoghyID by authentication code.');
     }
 
     public function testHandleRegisterCallbackConnectUserAndRedirectToHomeWhenLoggedIn()
     {
-        $user = User::factory()->create([
-            'loghy_id' => $this->faker->randomDigitNot(0),
-        ]);
-        $request_data = [
-            'lgid' => $user->loghy_id + 1
-        ];
+        $user = User::factory()->create(['loghy_id' => '11']);
 
         Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => '12',
+                'userId' => null,
+            ]);
         Loghy::shouldReceive('mergeUser')
             ->once()
-            ->with($user->loghy_id, $request_data['lgid'])
+            ->with('11', '12')
             ->andReturn(true);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
-            ->with($request_data['lgid'])
+            ->with('12')
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
         $response = $this->actingAs($user)
             ->call('GET', route('auth.loghy.callback.register'), $request_data);
 

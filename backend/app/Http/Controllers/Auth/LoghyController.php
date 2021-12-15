@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Lib\Loghy\Facades\Loghy;
 use App\Models\LoghyHistory;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +14,9 @@ use Illuminate\Support\Str;
 
 class LoghyController extends Controller
 {
+    private ?string $loghyId;
+    private ?string $userId;
+
     /**
      * Handle callback from Loghy without site_id on successful SNS login.
      *
@@ -24,16 +26,16 @@ class LoghyController extends Controller
     public function handleLoginCallback(Request $request)
     {
         try {
-            // TODO: Loghy からの callback であることを確認(Loghy側の実装待ち)
-
             Loghy::appendCallbackHistory('login_callback', $request->input());
 
+            // Set $loghyId to call deleteUserInfo
             $loghyId = $this->getLoghyId($request);
-            $userId = $this->getUserId($request);
-
             if (Auth::check()) {
+                // There is no case that LoghyID,UserID in request and LoghyID,UserID user logged in is same
                 return $this->successRedirect(Auth::user(), 'Already connected 👍');
             }
+
+            $userId = $this->getUserId($request);
             $user = $this->findUser($loghyId, $userId);
             return $this->successRedirect($user, 'Logged in 🎉');
         } catch (LoghyCallbackHandleException $e) {
@@ -55,9 +57,8 @@ class LoghyController extends Controller
     public function handleRegisterCallback(Request $request)
     {
         try {
-            // TODO: Loghy からの callback であることを確認(Loghy側の実装待ち)
-
             Loghy::appendCallbackHistory('register_callback', $request->input());
+
             $loghyId = $this->getLoghyId($request);
 
             if (Auth::check()) {
@@ -96,12 +97,9 @@ class LoghyController extends Controller
      */
     private function getLoghyId(Request $request): string
     {
-        $loghyId = $request->input('lgid');
-
-        if (!$loghyId) {
-            throw new LoghyCallbackHandleException('LoghyID is not found in callback data.');
-        }
-        return $loghyId;
+        return $this->loghyId
+            ?? $this->getIdsByCode($request)['loghyId']
+            ?? throw new LoghyCallbackHandleException('Failed to get LoghyID by authentication code.');
     }
 
     /**
@@ -113,13 +111,33 @@ class LoghyController extends Controller
      */
     private function getUserId(Request $request): string
     {
-        $userId = $request->input('site_id');
+        return $this->userId
+            ?? $this->getIdsByCode($request)['userId']
+            ?? throw new LoghyCallbackHandleException('Failed to get UserID(site_id) by authentication code.');
+    }
 
-        if (!$userId) {
-            throw new LoghyCallbackHandleException('UserID(site_id) is not found in callback data.');
+    /**
+     * Get LoghyID and UserID from authentication code in request.
+     *
+     * @param Request $request
+     * @return array ['loghyId' => $loghyId, 'userId' => $userId]
+     * @throws LoghyCallbackHandleException
+     */
+    private function getIdsByCode(Request $request): array
+    {
+        $code = $request->input('code')
+            ?? throw new LoghyCallbackHandleException('Authentication code is not found in callback data.');
+
+        try {
+            $ids = Loghy::getLoghyId($code);
+
+            $this->loghyId = $ids['loghyId'] ?? null;
+            $this->userId = $ids['userId'] ?? null;
+
+            return $ids;
+        } catch (\Exception $e) {
+            throw new LoghyCallbackHandleException('Failed to get LoghyID by authentication code.', 0, $e);
         }
-
-        return $userId;
     }
 
     /**
@@ -215,7 +233,7 @@ class LoghyController extends Controller
     {
         try {
             return Loghy::deleteUserInfo($loghyId);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Failed to delete user information in Loghy. Its LoghyID is {$loghyId}");
             return false;
         }
