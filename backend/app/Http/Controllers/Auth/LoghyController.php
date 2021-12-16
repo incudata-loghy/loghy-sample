@@ -121,7 +121,7 @@ class LoghyController extends Controller
 
     /**
      * Get social login type from request.
-     * 
+     *
      * @param Request $request
      * @return string
      * @throws LoghyCallbackHandleException
@@ -249,7 +249,7 @@ class LoghyController extends Controller
 
     /**
      * Create social identity
-     * 
+     *
      * @param User $user
      * @param string $loghyId
      * @param string $type

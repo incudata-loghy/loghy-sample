@@ -26,7 +26,6 @@ class DropLoghyIdFromUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            
             $table->unsignedBigInteger('loghy_id')->nullable()->after('email')->unique();
         });
     }
