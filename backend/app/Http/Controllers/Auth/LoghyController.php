@@ -41,7 +41,6 @@ class LoghyController extends Controller
                 return $this->successRedirect(Auth::user(), 'Already logged in or connected 👍');
             }
             throw new LoghyCallbackHandleException('Invalid user is required.');
-            
         } catch (LoghyCallbackHandleException $e) {
             return $this->failRedirect($e->getMessage());
         } finally {
