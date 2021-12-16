@@ -232,16 +232,13 @@ class LoghyController extends Controller
      *
      * @param array $userInfo
      * @param string $loghyId
-     * @return User
+     * @return null|User
      */
-    private function createUser(array $userInfo): User
+    private function createUser(array $userInfo): ?User
     {
         $name = $userInfo['name'] ?? null;
         $email = $userInfo['email'] ?? null;
 
-        if (!$email) {
-            return null;
-        }
         return User::firstOrCreate(
             ['email' => $email],
             ['name' => $name, 'password' => md5(Str::uuid())]
