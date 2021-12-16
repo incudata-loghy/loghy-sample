@@ -34,13 +34,14 @@ class LoghyController extends Controller
             $userId = $this->getUserId($request);
             $user = $this->findUser($loghyId, $userId);
 
-            if (Auth::check()) {
-                if ($user->is(Auth::user())) {
-                    return $this->successRedirect(Auth::user(), 'Already logged in or connected 👍');
-                }
-                throw new LoghyCallbackHandleException('Invalid user is required.');
+            if (!Auth::check()) {
+                return $this->successRedirect($user, 'Logged in 🎉');
             }
-            return $this->successRedirect($user, 'Logged in 🎉');
+            if ($user->is(Auth::user())) {
+                return $this->successRedirect(Auth::user(), 'Already logged in or connected 👍');
+            }
+            throw new LoghyCallbackHandleException('Invalid user is required.');
+            
         } catch (LoghyCallbackHandleException $e) {
             return $this->failRedirect($e->getMessage());
         } finally {
