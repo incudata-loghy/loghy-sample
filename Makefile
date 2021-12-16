@@ -81,6 +81,8 @@ tinker:
 	docker compose exec app php artisan tinker
 test:
 	docker compose exec app php artisan test
+coverage:
+	docker compose exec app bash -c "./vendor/bin/phpunit --coverage-html coverage"
 optimize:
 	docker compose exec app php artisan optimize
 optimize-clear:
