@@ -58,7 +58,7 @@ class LoghyControllerTest extends TestCase
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
-        
+
         $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
         $response = $this->actingAs($user)
             ->call('GET', route('auth.loghy.callback.login'), $request_data);
