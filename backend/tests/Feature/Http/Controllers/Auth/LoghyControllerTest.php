@@ -223,6 +223,43 @@ class LoghyControllerTest extends TestCase
             ->assertDatabaseCount('social_identities', 1);
     }
 
+    public function testHandleRegisterCallbackCanCreateUserWithoutEmail()
+    {
+        Loghy::shouldReceive('appendCallbackHistory')->once();
+        Loghy::shouldReceive('getLoghyId')
+            ->once()
+            ->with('xxxxxxxxxxxxxxxxxxxx')
+            ->andReturn([
+                'loghyId' => '111',
+                'userId' => null,
+                'socialLogin' => 'google',
+            ]);
+        Loghy::shouldReceive('getUserInfo')
+            ->once()
+            ->with('111')
+            ->andReturn([
+                'sid' => '11111111111111111111',
+                'name' => null,
+                'email' => null,
+            ]);
+        Loghy::shouldReceive('deleteUserInfo')
+            ->once()
+            ->with('111')
+            ->andReturn(true);
+        Loghy::shouldReceive('putUserId')->once()->andReturn(true);
+        Loghy::shouldReceive('history')->once()->andReturn([]);
+
+        $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
+        $response = $this->call('GET', route('auth.loghy.callback.register'), $request_data);
+
+        $response
+            ->assertRedirect(route('home'))
+            ->assertSessionHas('success', 'Registered 🎉');
+        $this
+            ->assertDatabaseCount('users', 1)
+            ->assertDatabaseCount('social_identities', 1);
+    }
+
     public function testHandleRegisterRedirectToRegisterWhenNoCode()
     {
         $response = $this->call('GET', route('auth.loghy.callback.register'), []);
