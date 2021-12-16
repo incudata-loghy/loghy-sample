@@ -84,16 +84,6 @@ class LoghyProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testMergeUserReturnTrue()
-    {
-        Http::fake(Http::response([
-            'result' => true,
-        ]));
-
-        $result = $this->provider->mergeUser('1', '2');
-        $this->assertTrue($result);
-    }
-
     public function testGetLoghyIdReturnLoghyIdAndSiteId()
     {
         Http::fake(Http::response([

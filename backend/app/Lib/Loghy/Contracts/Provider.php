@@ -51,16 +51,6 @@ interface Provider
     public function deleteLoghyId(string $loghyId): bool;
 
     /**
-     * Merge users by Loghy ID.
-     * LoghyID 指定データマージ
-     *
-     * @param string $targetLoghyId
-     * @param string $sourceLoghyId
-     * @return bool
-     */
-    public function mergeUser(string $targetLoghyId, string $sourceLoghyId): bool;
-
-    /**
      * Get Loghy ID and User ID by authentication code.
      * LoghyID取得
      *
