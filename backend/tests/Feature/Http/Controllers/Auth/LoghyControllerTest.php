@@ -42,13 +42,15 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleLoginCallbackRedirectToHomeWhenLoggedIn()
     {
+        $user = User::factory()->hasSocialIdentities(1, ['loghy_id' => '111'])->create();
+
         Loghy::shouldReceive('appendCallbackHistory')->once();
         Loghy::shouldReceive('getLoghyId')
             ->once()
             ->with('xxxxxxxxxxxxxxxxxxxx')
             ->andReturn([
                 'loghyId' => '111',
-                'userId' => '1',
+                'userId' => $user->id,
             ]);
         Loghy::shouldReceive('deleteUserInfo')
             ->once()
@@ -56,15 +58,14 @@ class LoghyControllerTest extends TestCase
             ->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
-        /** @var User $user */
-        $user = User::factory()->create();
+        
         $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
         $response = $this->actingAs($user)
             ->call('GET', route('auth.loghy.callback.login'), $request_data);
 
         $response
             ->assertRedirect(route('home'))
-            ->assertSessionHas('success', 'Already connected 👍');
+            ->assertSessionHas('success', 'Already logged in or connected 👍');
     }
 
     public function testHandleLoginRedirectToRegisterWhenNoCode()
