@@ -17,6 +17,7 @@ class LoghyController extends Controller
 {
     private ?string $loghyId;
     private ?string $userId;
+    private ?string $socialLoginType;
 
     /**
      * Handle callback from Loghy without site_id on successful SNS login.
