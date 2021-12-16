@@ -129,23 +129,6 @@ class LoghyProvider implements ProviderContract
     }
 
     /**
-     * Merge users by Loghy ID.
-     * LoghyID 指定データマージ
-     *
-     * @param string $targetLoghyId
-     * @param string $sourceLoghyId
-     * @return bool
-     */
-    public function mergeUser(string $targetLoghyId, string $sourceLoghyId): bool
-    {
-        $command = 'lgid2merge';
-
-        $response = $this->requestApi($command, $targetLoghyId, $sourceLoghyId);
-
-        return $response->json('result', false);
-    }
-
-    /**
      * Get Loghy ID and User ID by authentication code.
      * LoghyID取得
      *
@@ -167,6 +150,7 @@ class LoghyProvider implements ProviderContract
         return [
             'loghyId' => $response->json('data.lgid'),
             'userId' => $response->json('data.site_id'),
+            'socialLogin' => $response->json('data.social_login'),
         ];
     }
 

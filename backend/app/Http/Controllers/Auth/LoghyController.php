@@ -6,6 +6,7 @@ use App\Exceptions\LoghyCallbackHandleException;
 use App\Http\Controllers\Controller;
 use App\Lib\Loghy\Facades\Loghy;
 use App\Models\LoghyHistory;
+use App\Models\SocialIdentity;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,15 +29,16 @@ class LoghyController extends Controller
         try {
             Loghy::appendCallbackHistory('login_callback', $request->input());
 
-            // Set $loghyId to call deleteUserInfo
             $loghyId = $this->getLoghyId($request);
-            if (Auth::check()) {
-                // There is no case that LoghyID,UserID in request and LoghyID,UserID user logged in is same
-                return $this->successRedirect(Auth::user(), 'Already connected 👍');
-            }
-
             $userId = $this->getUserId($request);
             $user = $this->findUser($loghyId, $userId);
+
+            if (Auth::check()) {
+                if ($user->is(Auth::user())) {
+                    return $this->successRedirect(Auth::user(), 'Already logged in or connected 👍');
+                }
+                throw new LoghyCallbackHandleException('Invalid user is required.');
+            }
             return $this->successRedirect($user, 'Logged in 🎉');
         } catch (LoghyCallbackHandleException $e) {
             return $this->failRedirect($e->getMessage());
@@ -60,12 +62,13 @@ class LoghyController extends Controller
             Loghy::appendCallbackHistory('register_callback', $request->input());
 
             $loghyId = $this->getLoghyId($request);
+            $socialLoginType = $this->getSocialLoginType($request);
 
             if (Auth::check()) {
-                $user = $this->connectUser($loghyId);
+                $user = $this->connectUser($loghyId, $socialLoginType);
                 return $this->successRedirect($user, 'Connected 🎉');
             }
-            $user = $this->registerUser($loghyId);
+            $user = $this->registerUser($loghyId, $socialLoginType);
             return $this->successRedirect($user, 'Registered 🎉');
         } catch (LoghyCallbackHandleException $e) {
             return $this->failRedirect($e->getMessage());
@@ -92,7 +95,7 @@ class LoghyController extends Controller
      * Get LoghyID from request.
      *
      * @param Request $request
-     * @return string $loghyId
+     * @return string
      * @throws LoghyCallbackHandleException
      */
     private function getLoghyId(Request $request): string
@@ -106,7 +109,7 @@ class LoghyController extends Controller
      * Get UserID (site_id) from request.
      *
      * @param Request $request
-     * @return string $loghyId
+     * @return string
      * @throws LoghyCallbackHandleException
      */
     private function getUserId(Request $request): string
@@ -114,6 +117,20 @@ class LoghyController extends Controller
         return $this->userId
             ?? $this->getIdsByCode($request)['userId']
             ?? throw new LoghyCallbackHandleException('Failed to get UserID(site_id) by authentication code.');
+    }
+
+    /**
+     * Get social login type from request.
+     * 
+     * @param Request $request
+     * @return string
+     * @throws LoghyCallbackHandleException
+     */
+    private function getSocialLoginType(Request $request): string
+    {
+        return $this->socialLoginType
+            ?? $this->getIdsByCode($request)['social_login']
+            ?? throw new LoghyCallbackHandleException('Failed to get social Login type by authentication code.');
     }
 
     /**
@@ -133,6 +150,7 @@ class LoghyController extends Controller
 
             $this->loghyId = $ids['loghyId'] ?? null;
             $this->userId = $ids['userId'] ?? null;
+            $this->socialLoginType = $ids['socialLogin'] ?? null;
 
             return $ids;
         } catch (\Exception $e) {
@@ -147,12 +165,19 @@ class LoghyController extends Controller
      * @return User
      * @throws LoghyCallbackHandleException
      */
-    private function connectUser($loghyId): User
+    private function connectUser(string $loghyId, ?string $socialLoginType): User
     {
+        $userInfo = Loghy::getUserInfo($loghyId);
+        if (!$userInfo) {
+            throw new LoghyCallbackHandleException('Failed to get personal data.');
+        }
+
         /** @var User $user */
         $user = Auth::user();
 
-        Loghy::mergeUser($user->loghy_id, $loghyId);
+        $this->createSocialIdentity($user, $loghyId, $socialLoginType, $userInfo);
+
+        Loghy::putUserId($loghyId, $user->id);
 
         return $user;
     }
@@ -164,17 +189,19 @@ class LoghyController extends Controller
      * @return User
      * @throws LoghyCallbackHandleException
      */
-    private function registerUser($loghyId): User
+    private function registerUser(string $loghyId, ?string $socialLoginType): User
     {
         $userInfo = Loghy::getUserInfo($loghyId);
         if (!$userInfo) {
             throw new LoghyCallbackHandleException('Failed to get personal data.');
         }
 
-        $user = $this->createUser($userInfo, $loghyId);
+        $user = $this->createUser($userInfo, $loghyId, $socialLoginType);
         if (!$user) {
             throw new LoghyCallbackHandleException('Failed to register user.');
         }
+
+        $this->createSocialIdentity($user, $loghyId, $socialLoginType, $userInfo);
 
         Loghy::putUserId($loghyId, $user->id);
 
@@ -190,11 +217,9 @@ class LoghyController extends Controller
      */
     private function findUser(string $loghyId, string $userId): User
     {
-        $user = User::where([
-            'id' => $userId, 'loghy_id' => $loghyId,
-        ])->first();
+        $user = User::find($userId);
 
-        if (!$user) {
+        if (!$user || !$user->hasLoghyId($loghyId)) {
             throw new LoghyCallbackHandleException('User not found with specified UserID(site_id) and LoghyID.');
         }
 
@@ -208,7 +233,7 @@ class LoghyController extends Controller
      * @param string $loghyId
      * @return User
      */
-    private function createUser(array $userInfo, string $loghyId): User
+    private function createUser(array $userInfo): User
     {
         $name = $userInfo['name'] ?? null;
         $email = $userInfo['email'] ?? null;
@@ -216,11 +241,29 @@ class LoghyController extends Controller
         if (!$email) {
             return null;
         }
-
         return User::firstOrCreate(
             ['email' => $email],
-            ['name' => $name, 'password' => md5(Str::uuid()), 'loghy_id' => $loghyId]
+            ['name' => $name, 'password' => md5(Str::uuid())]
         );
+    }
+
+    /**
+     * Create social identity
+     * 
+     * @param User $user
+     * @param string $loghyId
+     * @param string $type
+     * @param array $userInfo
+     * @return SocialIdentity
+     * @throws LoghyCallbackHandleException
+     */
+    private function createSocialIdentity(User $user, string $loghyId, string $type, array $userInfo): SocialIdentity
+    {
+        $sub = $userInfo['sid'] ?? throw new LoghyCallbackHandleException('The sub is not found in user information.');
+
+        return $user->socialIdentities()->firstOrCreate([
+            'loghy_id' => $loghyId, 'type' => $type, 'sub' => $sub,
+        ]);
     }
 
     /**
