@@ -18,18 +18,13 @@ class LoghyControllerTest extends TestCase
     {
         $user = User::factory()->hasSocialIdentities(1, ['loghy_id' => '111'])->create();
 
+        $ids = [
+            'loghyId' => '111',
+            'userId' => $user->id,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '111',
-                'userId' => $user->id,
-            ]);
-        Loghy::shouldReceive('deleteUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn(true);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
+        Loghy::shouldReceive('deleteUserInfo')->once()->with('111')->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
@@ -44,20 +39,14 @@ class LoghyControllerTest extends TestCase
     {
         $user = User::factory()->hasSocialIdentities(1, ['loghy_id' => '111'])->create();
 
+        $ids = [
+            'loghyId' => '111',
+            'userId' => $user->id,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '111',
-                'userId' => $user->id,
-            ]);
-        Loghy::shouldReceive('deleteUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn(true);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
+        Loghy::shouldReceive('deleteUserInfo')->once()->with('111')->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
-
 
         $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
         $response = $this->actingAs($user)
@@ -80,9 +69,7 @@ class LoghyControllerTest extends TestCase
     public function testHandleLoginCallbackRedirectToRegisterWhenFailedToGetLoghyIdByCode()
     {
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')
             ->andThrows(new \Exception());
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
@@ -96,14 +83,12 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleLoginCallbackRedirectToRegisterWhenNoLoghyId()
     {
+        $ids = [
+            'loghyId' => null,
+            'userId' => '1'
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => null,
-                'userId' => '1'
-            ]);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
@@ -116,14 +101,12 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleLoginCallbackRedirectToRegisterWhenNoSiteId()
     {
+        $ids = [
+            'loghyId' => '111',
+            'userId' => null,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->twice()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '111',
-                'userId' => null,
-            ]);
+        Loghy::shouldReceive('getLoghyId')->twice()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         $request_data = ['code' => 'xxxxxxxxxxxxxxxxxxxx'];
@@ -138,18 +121,13 @@ class LoghyControllerTest extends TestCase
     {
         $user = User::factory()->hasSocialIdentities(1, ['loghy_id' => '111'])->create();
 
+        $ids = [
+            'loghyId' => '222',
+            'userId' => $user->id,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '222',
-                'userId' => $user->id,
-            ]);
-        Loghy::shouldReceive('deleteUserInfo')
-            ->once()
-            ->with('222')
-            ->andReturn(true);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
+        Loghy::shouldReceive('deleteUserInfo')->once()->with('222')->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
@@ -164,18 +142,13 @@ class LoghyControllerTest extends TestCase
     {
         $user = User::factory()->hasSocialIdentities(1, ['loghy_id' => '111'])->create();
 
+        $ids = [
+            'loghyId' => '111',
+            'userId' => $user->id + 1,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '111',
-                'userId' => $user->id + 1,
-            ]);
-        Loghy::shouldReceive('deleteUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn(true);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
+        Loghy::shouldReceive('deleteUserInfo')->once()->with('111')->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
@@ -188,27 +161,20 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleRegisterCallbackCreateUserAndRedirectToHomeWhenNotLoggedIn()
     {
+        $ids = [
+            'loghyId' => '111',
+            'userId' => null,
+            'socialLogin' => 'google',
+        ];
+        $userInfo = [
+            'sid' => '11111111111111111111',
+            'name' => $this->faker()->name(),
+            'email' => $this->faker()->email(),
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '111',
-                'userId' => null,
-                'socialLogin' => 'google',
-            ]);
-        Loghy::shouldReceive('getUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn([
-                'sid' => '11111111111111111111',
-                'name' => $this->faker()->name(),
-                'email' => $this->faker()->email(),
-            ]);
-        Loghy::shouldReceive('deleteUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn(true);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
+        Loghy::shouldReceive('getUserInfo')->once()->with('111')->andReturn($userInfo);
+        Loghy::shouldReceive('deleteUserInfo')->once()->with('111')->andReturn(true);
         Loghy::shouldReceive('putUserId')->once()->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
@@ -225,27 +191,20 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleRegisterCallbackCanCreateUserWithoutEmail()
     {
+        $ids = [
+            'loghyId' => '111',
+            'userId' => null,
+            'socialLogin' => 'google',
+        ];
+        $userInfo = [
+            'sid' => '11111111111111111111',
+            'name' => null,
+            'email' => null,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => '111',
-                'userId' => null,
-                'socialLogin' => 'google',
-            ]);
-        Loghy::shouldReceive('getUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn([
-                'sid' => '11111111111111111111',
-                'name' => null,
-                'email' => null,
-            ]);
-        Loghy::shouldReceive('deleteUserInfo')
-            ->once()
-            ->with('111')
-            ->andReturn(true);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
+        Loghy::shouldReceive('getUserInfo')->once()->with('111')->andReturn($userInfo);
+        Loghy::shouldReceive('deleteUserInfo')->once()->with('111')->andReturn(true);
         Loghy::shouldReceive('putUserId')->once()->andReturn(true);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
@@ -271,14 +230,12 @@ class LoghyControllerTest extends TestCase
 
     public function testHandleRegisterCallbackRedirectToRegisterWhenNoLoghyId()
     {
+        $ids = [
+            'loghyId' => null,
+            'userId' => null,
+        ];
         Loghy::shouldReceive('appendCallbackHistory')->once();
-        Loghy::shouldReceive('getLoghyId')
-            ->once()
-            ->with('xxxxxxxxxxxxxxxxxxxx')
-            ->andReturn([
-                'loghyId' => null,
-                'userId' => null,
-            ]);
+        Loghy::shouldReceive('getLoghyId')->once()->with('xxxxxxxxxxxxxxxxxxxx')->andReturn($ids);
         Loghy::shouldReceive('history')->once()->andReturn([]);
 
         $request_data = [ 'code' => 'xxxxxxxxxxxxxxxxxxxx' ];
