@@ -16,3 +16,6 @@ yarn-error.log
 
 # PHP CS Fixer
 .php-cs-fixer.cache
+
+# phpunit coverage
+coverage
