@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7feb7226f18899cb835937298e94e44a",
+    "content-hash": "900e130cecc5d73c36124348b1d67cb3",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -7371,16 +7371,16 @@
         },
         {
             "name": "incudata-loghy/loghy-php",
-            "version": "dev-main",
+            "version": "dev-feat-Add-delete-User-ID",
             "source": {
                 "type": "git",
                 "url": "git@github.com:incudata-loghy/Loghy-PHP.git",
-                "reference": "60dfddae944bdef965a801cb5f5cb0f4ddb7de52"
+                "reference": "9964caccf3449648cfe0cc6c1658807e49c5117b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/incudata-loghy/Loghy-PHP/zipball/60dfddae944bdef965a801cb5f5cb0f4ddb7de52",
-                "reference": "60dfddae944bdef965a801cb5f5cb0f4ddb7de52",
+                "url": "https://api.github.com/repos/incudata-loghy/Loghy-PHP/zipball/9964caccf3449648cfe0cc6c1658807e49c5117b",
+                "reference": "9964caccf3449648cfe0cc6c1658807e49c5117b",
                 "shasum": ""
             },
             "require": {
@@ -7389,7 +7389,6 @@
             "require-dev": {
                 "pestphp/pest": "^1.21"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -7414,10 +7413,10 @@
             ],
             "description": "Loghy PHP SDK.",
             "support": {
-                "source": "https://github.com/incudata-loghy/Loghy-PHP/tree/main",
+                "source": "https://github.com/incudata-loghy/Loghy-PHP/tree/feat-Add-delete-User-ID",
                 "issues": "https://github.com/incudata-loghy/Loghy-PHP/issues"
             },
-            "time": "2021-12-24T05:38:05+00:00"
+            "time": "2021-12-24T09:24:02+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
