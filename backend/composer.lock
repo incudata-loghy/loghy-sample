@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f5317eb32fd32eb7fe7d0bd664235a3",
+    "content-hash": "7feb7226f18899cb835937298e94e44a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -7370,6 +7370,56 @@
             "time": "2020-07-09T08:09:16+00:00"
         },
         {
+            "name": "incudata-loghy/loghy-php",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:incudata-loghy/Loghy-PHP.git",
+                "reference": "60dfddae944bdef965a801cb5f5cb0f4ddb7de52"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/incudata-loghy/Loghy-PHP/zipball/60dfddae944bdef965a801cb5f5cb0f4ddb7de52",
+                "reference": "60dfddae944bdef965a801cb5f5cb0f4ddb7de52",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.4"
+            },
+            "require-dev": {
+                "pestphp/pest": "^1.21"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Loghy\\SDK\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Loghy\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "@php ./vendor/bin/pest --stop-on-failure"
+                ]
+            },
+            "authors": [
+                {
+                    "name": "INCUDATA",
+                    "email": "loghy_support@incudata.co.jp"
+                }
+            ],
+            "description": "Loghy PHP SDK.",
+            "support": {
+                "source": "https://github.com/incudata-loghy/Loghy-PHP/tree/main",
+                "issues": "https://github.com/incudata-loghy/Loghy-PHP/issues"
+            },
+            "time": "2021-12-24T05:38:05+00:00"
+        },
+        {
             "name": "justinrainbow/json-schema",
             "version": "5.2.11",
             "source": {
@@ -9815,7 +9865,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "incudata-loghy/loghy-php": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
