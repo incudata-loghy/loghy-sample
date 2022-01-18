@@ -158,7 +158,8 @@ class LoghyController extends Controller
             var_dump($e->getMessage());
             throw new LoghyCallbackHandleException(
                 'Failed to get LoghyID by authentication code. Error message: ' . $e->getMessage(),
-                $e->getCode(), $e
+                $e->getCode(),
+                $e
             );
         }
     }
@@ -194,7 +195,8 @@ class LoghyController extends Controller
         } catch (\Exception $e) {
             throw new LoghyCallbackHandleException(
                 'Failed to connect User. Error message: ' . $e->getMessage(),
-                $e->getCode(), $e
+                $e->getCode(),
+                $e
             );
         }
     }
@@ -233,7 +235,8 @@ class LoghyController extends Controller
         } catch (\Exception $e) {
             throw new LoghyCallbackHandleException(
                 'Failed to register user. Error message: ' . $e->getMessage(),
-                $e->getCode(), $e
+                $e->getCode(),
+                $e
             );
         }
     }

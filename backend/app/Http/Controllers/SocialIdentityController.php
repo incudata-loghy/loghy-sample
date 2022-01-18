@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Loghy;
 use App\Models\SocialIdentity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class SocialIdentityController extends Controller
             403
         );
 
-        $response = \Loghy::deleteUserId($socialIdentity->loghy_id);
+        $response = Loghy::deleteUserId($socialIdentity->loghy_id);
         if ($response['result'] === false) {
             return redirect()
                 ->route('home')

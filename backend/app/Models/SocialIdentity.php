@@ -9,7 +9,7 @@ class SocialIdentity extends Model
 {
     use HasFactory;
 
-    const TYPES = [
+    public const TYPES = [
         'line' => 'LINE',
         'google' => 'Google',
         'facebook' => 'Facebook',
