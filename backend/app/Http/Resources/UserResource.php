@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\SocialIdentity;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -16,11 +17,9 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'loghy_id' => $this->loghy_id,
             'name' => $this->name,
             'email' => $this->email,
-
-            'loghy_history' => LoghyHistoryResource::collection($this->loghyHistory),
+            // 'avatar' => 'coming soon...',
         ];
     }
 }

@@ -47,14 +47,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the Loghy history for the user.
-     */
-    public function loghyHistory()
-    {
-        return $this->hasMany(LoghyHistory::class);
-    }
-
-    /**
      * Get the Social Identity for the user.
      */
     public function socialIdentities()

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoghyController;
+use App\Http\Controllers\SocialIdentityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,5 +30,6 @@ Route::group(['prefix' => 'auth', 'as' => 'auth.'], function () {
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::delete('/loghy_history', [App\Http\Controllers\LoghyHistoryController::class, 'destroy'])
-    ->name('loghy_history.destroy');
+
+Route::delete('/social_identities/{socialIdentity}', [SocialIdentityController::class, 'destroy'])
+    ->name('social_identities.destroy');

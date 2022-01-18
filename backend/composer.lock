@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f5317eb32fd32eb7fe7d0bd664235a3",
+    "content-hash": "bf4e8ce29a1deeadff46be1749baa0ff",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -7368,6 +7368,48 @@
                 "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.0.1"
             },
             "time": "2020-07-09T08:09:16+00:00"
+        },
+        {
+            "name": "incudata-loghy/loghy-php",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/incudata-loghy/Loghy-PHP.git",
+                "reference": "9db025ff60b9c86f83ca2b804c2f11a54f3e3899"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/incudata-loghy/Loghy-PHP/zipball/9db025ff60b9c86f83ca2b804c2f11a54f3e3899",
+                "reference": "9db025ff60b9c86f83ca2b804c2f11a54f3e3899",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.4",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "pestphp/pest": "^1.21",
+                "phpstan/phpstan": "^1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Loghy\\SDK\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "INCUDATA",
+                    "email": "loghy_support@incudata.co.jp"
+                }
+            ],
+            "description": "Loghy PHP SDK.",
+            "support": {
+                "issues": "https://github.com/incudata-loghy/Loghy-PHP/issues",
+                "source": "https://github.com/incudata-loghy/Loghy-PHP/tree/0.1.0"
+            },
+            "time": "2022-01-13T03:58:55+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

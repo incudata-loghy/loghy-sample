@@ -135,3 +135,7 @@ lint:
 	docker compose exec app bash -c "./vendor/bin/php-cs-fixer fix ./ --using-cache=no"
 phpstan:
 	docker compose exec app bash -c "./vendor/bin/phpstan analyse app tests"
+ci:
+	@make phpstan
+	@make lint
+	@make test

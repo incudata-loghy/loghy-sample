@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Models\SocialIdentity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,10 +27,9 @@ class HomeController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $user = new UserResource($user);
+        $snsList = SocialIdentity::status($user);
 
-        $output = [
-            'user' => new UserResource($user),
-        ];
-        return view('home', compact('output'));
+        return view('home', compact('user', 'snsList'));
     }
 }
