@@ -10,18 +10,18 @@
         "friendsofphp/php-cs-fixer": "^3.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "^8.65",
+        "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "laravel/ui": "^3.3"
+        "laravel/ui": "^3.4",
+        "spatie/laravel-ignition": "^1.0"
     },
     "require-dev": {
-        "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "incudata-loghy/loghy-php": "^0.1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^5.10",
+        "nunomaduro/collision": "^6.0",
         "nunomaduro/larastan": "^1.0",
         "phpunit/phpunit": "^9.5.10"
     },
