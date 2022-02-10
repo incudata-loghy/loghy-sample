@@ -42,4 +42,4 @@ jobs:
         run: docker-compose exec -T app php artisan key:generate
 
       - name: Execute PHPStan(Larastan)
-        run: docker compose exec app bash -c "./vendor/bin/phpstan analyse app tests"
+        run: docker compose exec -T app bash -c "./vendor/bin/phpstan analyse app tests"
