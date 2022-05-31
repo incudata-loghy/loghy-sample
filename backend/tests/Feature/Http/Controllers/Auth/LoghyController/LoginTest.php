@@ -67,4 +67,3 @@ it('redirect to login page when throw exception', function () {
         ->assertRedirect(route('login'))
         ->assertSessionHas('error', 'Something went wrong...');
 });
-

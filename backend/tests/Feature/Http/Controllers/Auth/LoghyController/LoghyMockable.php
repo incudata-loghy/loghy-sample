@@ -9,12 +9,11 @@ use Loghy\SDK\User as LoghyUser;
 
 trait LoghyMockable
 {
-    function mockLoghy(
+    public function mockLoghy(
         array $attributes = [],
         SocialIdentity $identity = null,
         User $user = null
-    ): LoghyUser
-    {
+    ): LoghyUser {
         $loghyUser = (new LoghyUser())->map($attributes + [
             'id'      => $identity?->sub  ?? '__sub__',
             'type'    => $identity?->type ?? '__type__',

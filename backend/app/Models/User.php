@@ -67,7 +67,7 @@ class User extends Authenticatable
 
     /**
      * Find user from loghy user.
-     * 
+     *
      * @param \Loghy\SDK\User $loghyUser
      * @return \App\Models\User|null
      */
@@ -83,7 +83,7 @@ class User extends Authenticatable
 
     /**
      * Create user from loghy user.
-     * 
+     *
      * @param \Loghy\SDK\User $loghyUser
      * @return \App\Models\User|null
      */

@@ -15,7 +15,7 @@ test('findByLoghyUser() return User instance', function () {
     $user = User::factory()->create();
     $identify = SocialIdentity::factory()->for($user)->create();
 
-    $loghyUser = (new LoghyUser)->map([
+    $loghyUser = (new LoghyUser())->map([
         'id' => $identify->sub,
         'type' => $identify->type,
         'loghyId' => $identify->loghy_id,
@@ -32,7 +32,7 @@ test('findByLoghyUser() return User instance when loghyUser has no user ID', fun
     $user = User::factory()->create();
     $identify = SocialIdentity::factory()->for($user)->create();
 
-    $loghyUser = (new LoghyUser)->map([
+    $loghyUser = (new LoghyUser())->map([
         'id' => $identify->sub,
         'type' => $identify->type,
         'loghyId' => $identify->loghy_id,
@@ -48,7 +48,7 @@ test('findByLoghyUser() return User instance when loghyUser has no user ID', fun
 test('findByLoghyUser() return null when SocialIdentity is not created', function () {
     $user = User::factory()->create();
 
-    $loghyUser = (new LoghyUser)->map([
+    $loghyUser = (new LoghyUser())->map([
         'id' => '__sub__',
         'type' => '__type__',
         'loghyId' => '__loghy_id__',

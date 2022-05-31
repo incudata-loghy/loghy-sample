@@ -39,7 +39,6 @@ class LoghyController extends Controller
                 return $this->failRedirect('User not found.', 'login');
             }
             return $this->successRedirect($user, 'Logged in 🎉');
-
         } catch (\Exception $e) {
             report($e);
             return $this->failRedirect('Something went wrong...', 'login');
@@ -68,7 +67,6 @@ class LoghyController extends Controller
             $user = $this->registerUser($loghyUser);
 
             return $this->successRedirect($user, 'Registered 🎉');
-
         } catch (\Exception $e) {
             report($e);
             return $this->failRedirect('Something went wrong...', 'register');
@@ -88,7 +86,7 @@ class LoghyController extends Controller
 
     /**
      * Handle callback from Loghy for connect another SNS.
-     * 
+     *
      * @param Request $request
      * @return mixed
      */
@@ -118,7 +116,6 @@ class LoghyController extends Controller
             }
             $user->createSocialIdentityByLoghyUser($loghyUser);
             return $this->successRedirect($user, 'Connected 👍');
-
         } catch (\Exception $e) {
             report($e);
             return $this->failRedirect('Something went wrong...');
@@ -165,10 +162,10 @@ class LoghyController extends Controller
 
     /**
      * Register user.
-     * 
+     *
      * @param \Loghy\SDK\User $loghyUser
      * @return \App\Models\User
-     * 
+     *
      * @throws \RuntimeException
      */
     private function registerUser(LoghyUser $loghyUser): User
