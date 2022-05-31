@@ -24,8 +24,9 @@ Auth::routes();
 Route::group(['prefix' => 'auth', 'as' => 'auth.'], function () {
     Route::group(['prefix' => 'loghy/callback', 'as' => 'loghy.callback.'], function () {
         Route::get('register', [LoghyController::class, 'handleRegisterCallback'])->name('register');
-        Route::get('login', [LoghyController::class, 'handleLoginCallback'])   ->name('login');
-        Route::get('error', [LoghyController::class, 'handleErrorCallback'])   ->name('error');
+        Route::get('login',    [LoghyController::class, 'handleLoginCallback'])   ->name('login');
+        Route::get('error',    [LoghyController::class, 'handleErrorCallback'])   ->name('error');
+        Route::get('connect',  [LoghyController::class, 'handleConnectCallback']) ->name('connect');
     });
 });
 

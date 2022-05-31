@@ -7,17 +7,17 @@ use App\Facades\Loghy;
 use App\Http\Controllers\Controller;
 use App\Models\SocialIdentity;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Loghy\SDK\User as LoghyUser;
+
+use function PHPUnit\Framework\assertInstanceOf;
 
 class LoghyController extends Controller
 {
-    private ?string $loghyId;
-    private ?string $userId;
-    private ?string $socialLoginType;
-
     /**
      * Handle callback from Loghy without site_id on successful SNS login.
      *
@@ -27,23 +27,22 @@ class LoghyController extends Controller
     public function handleLoginCallback(Request $request)
     {
         try {
-            $loghyId = $this->getLoghyId($request);
-            $userId = $this->getUserId($request);
-            $user = $this->findUser($loghyId, $userId);
+            $code = $request->input('code');
+            if (!$code) {
+                return $this->failRedirect('Authentication code is not found in callback data.', 'login');
+            }
 
-            if (!Auth::check()) {
-                return $this->successRedirect($user, 'Logged in 🎉');
+            $loghyUser = Loghy::setCode($code)->user();
+            $user = User::findByLoghyUser($loghyUser);
+            if (!$user) {
+                Log::info("User not found", ['loghy_user' => $loghyUser]);
+                return $this->failRedirect('User not found.', 'login');
             }
-            if ($user->is(Auth::user())) {
-                return $this->successRedirect(Auth::user(), 'Already logged in or connected 👍');
-            }
-            throw new LoghyCallbackHandleException('Invalid user is required.');
-        } catch (LoghyCallbackHandleException $e) {
-            return $this->failRedirect($e->getMessage());
-        } finally {
-            if (isset($loghyId)) {
-                $this->deleteUserInfo($loghyId);
-            }
+            return $this->successRedirect($user, 'Logged in 🎉');
+
+        } catch (\Exception $e) {
+            report($e);
+            return $this->failRedirect('Something went wrong...', 'login');
         }
     }
 
@@ -56,21 +55,23 @@ class LoghyController extends Controller
     public function handleRegisterCallback(Request $request)
     {
         try {
-            $loghyId = $this->getLoghyId($request);
-            $socialLoginType = $this->getSocialLoginType($request);
+            $code = $request->input('code');
+            if (!$code) {
+                return $this->failRedirect('Authentication code is not found in callback data.', 'register');
+            }
 
-            if (Auth::check()) {
-                $user = $this->connectUser($loghyId, $socialLoginType);
-                return $this->successRedirect($user, 'Connected 🎉');
+            $loghyUser = Loghy::setCode($code)->user();
+
+            if (User::findByLoghyUser($loghyUser)) {
+                return $this->failRedirect('Already registered. Please login.', 'login');
             }
-            $user = $this->registerUser($loghyId, $socialLoginType);
+            $user = $this->registerUser($loghyUser);
+
             return $this->successRedirect($user, 'Registered 🎉');
-        } catch (LoghyCallbackHandleException $e) {
-            return $this->failRedirect($e->getMessage());
-        } finally {
-            if (isset($loghyId)) {
-                $this->deleteUserInfo($loghyId);
-            }
+
+        } catch (\Exception $e) {
+            report($e);
+            return $this->failRedirect('Something went wrong...', 'register');
         }
     }
 
@@ -82,88 +83,49 @@ class LoghyController extends Controller
      */
     public function handleErrorCallback(Request $request)
     {
-        $this->failRedirect('Social Login failed.');
+        return $this->failRedirect('Social Login failed.');
     }
 
     /**
-     * Get LoghyID from request.
-     *
+     * Handle callback from Loghy for connect another SNS.
+     * 
      * @param Request $request
-     * @return string
-     * @throws LoghyCallbackHandleException
+     * @return mixed
      */
-    private function getLoghyId(Request $request): string
+    public function handleConnectCallback(Request $request)
     {
-        return $this->loghyId
-            ?? $this->getIdsByCode($request)['loghyId']
-            ?? throw new LoghyCallbackHandleException('Failed to get LoghyID by authentication code.');
-    }
-
-    /**
-     * Get UserID (site_id) from request.
-     *
-     * @param Request $request
-     * @return string
-     * @throws LoghyCallbackHandleException
-     */
-    private function getUserId(Request $request): string
-    {
-        return $this->userId
-            ?? $this->getIdsByCode($request)['userId']
-            ?? throw new LoghyCallbackHandleException('Failed to get UserID(site_id) by authentication code.');
-    }
-
-    /**
-     * Get social login type from request.
-     *
-     * @param Request $request
-     * @return string
-     * @throws LoghyCallbackHandleException
-     */
-    private function getSocialLoginType(Request $request): string
-    {
-        return $this->socialLoginType
-            ?? $this->getIdsByCode($request)['social_login']
-            ?? throw new LoghyCallbackHandleException('Failed to get social Login type by authentication code.');
-    }
-
-    /**
-     * Get LoghyID and UserID from authentication code in request.
-     *
-     * @param Request $request
-     * @return array ['loghyId' => $loghyId, 'userId' => $userId]
-     * @throws LoghyCallbackHandleException
-     */
-    private function getIdsByCode(Request $request): array
-    {
-        $code = $request->input('code')
-            ?? throw new LoghyCallbackHandleException('Authentication code is not found in callback data.');
-
         try {
-            $response = Loghy::getLoghyId($code);
-            $data = $this->verifyLoghyResponse($response);
+            $code = $request->input('code');
+            if (!$code) {
+                return $this->failRedirect('Authentication code is not found in callback data.');
+            }
+            $loghyUser = Loghy::setCode($code)->user();
 
-            $this->loghyId = $data['lgid'] ?? null;
-            $this->userId = $data['site_id'] ?? null;
-            $this->socialLoginType = $data['social_login'] ?? null;
+            $user = Auth::user();
+            if (!$user) {
+                Log::info("Not authenticated for connecting", ['loghy_user' => $loghyUser]);
+                return $this->failRedirect('Failed to connect without authenticated.');
+            }
+            assertInstanceOf(User::class, $user); /** @var \App\Models\User $user */
 
-            return [
-                'loghyId' => $this->loghyId,
-                'userId' => $this->userId,
-                'social_login' => $this->socialLoginType,
-            ];
-        } catch (LoghyCallbackHandleException $e) {
-            throw $e;
+            if ($loghyUser->getUserId() && $loghyUser->getUserId() !== (string)($user->id)) {
+                Log::warning("Connecting another user", ['user_id' => $user->id, 'loghy_user' => $loghyUser]);
+                return $this->failRedirect('Failed for invalid connection.');
+            }
+
+            if ($user->findSocialIdentityByLogyUser($loghyUser)) {
+                return $this->failRedirect('Already connected ✅');
+            }
+            $user->createSocialIdentityByLoghyUser($loghyUser);
+            return $this->successRedirect($user, 'Connected 👍');
+
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
-            throw new LoghyCallbackHandleException(
-                'Failed to get LoghyID by authentication code. Error message: ' . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
+            report($e);
+            return $this->failRedirect('Something went wrong...');
         }
     }
 
+    // TODO: handleConnectCallback
     /**
      * Connect LoghyID.
      *
@@ -203,79 +165,23 @@ class LoghyController extends Controller
 
     /**
      * Register user.
-     *
-     * @param string $loghyId
-     * @return User
-     * @throws LoghyCallbackHandleException
+     * 
+     * @param \Loghy\SDK\User $loghyUser
+     * @return \App\Models\User
+     * 
+     * @throws \RuntimeException
      */
-    private function registerUser(string $loghyId, ?string $socialLoginType): User
+    private function registerUser(LoghyUser $loghyUser): User
     {
-        try {
-            $response = Loghy::getUserInfo($loghyId);
-            $data = $this->verifyLoghyResponse($response);
+        $user = User::createByLoghyUser($loghyUser);
 
-            $userInfo = $data['personal_data'] ?? null;
-            if (!$userInfo) {
-                throw new LoghyCallbackHandleException('Failed to get personal data.');
-            }
-
-            $user = $this->createUser($userInfo, $loghyId, $socialLoginType);
-            if (!$user) {
-                throw new LoghyCallbackHandleException('Failed to register user.');
-            }
-
-            $this->createSocialIdentity($user, $loghyId, $socialLoginType, $userInfo);
-
-            $response = Loghy::putUserId($loghyId, $user->id);
-            $this->verifyLoghyResponse($response);
-
-            return $user;
-        } catch (LoghyCallbackHandleException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new LoghyCallbackHandleException(
-                'Failed to register user. Error message: ' . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
-    }
-
-    /**
-     * Find user.
-     *
-     * @param string $loghyId
-     * @return User
-     * @throws LoghyCallbackHandleException
-     */
-    private function findUser(string $loghyId, string $userId): User
-    {
-        $user = User::find($userId);
-
-        if (!$user || !$user->hasLoghyId($loghyId)) {
-            throw new LoghyCallbackHandleException('User not found with specified UserID(site_id) and LoghyID.');
+        if (! Loghy::putUserId($user->id, $loghyUser->getLoghyId())) {
+            Log::error("Failed to pu user ID", ['user_id' => $user->id, 'loghy_id' => $loghyUser->getLoghyId()]);
         }
 
         return $user;
     }
 
-    /**
-     * Create user.
-     *
-     * @param array $userInfo
-     * @param string $loghyId
-     * @return null|User
-     */
-    private function createUser(array $userInfo): ?User
-    {
-        $name = $userInfo['name'] ?? null;
-        $email = $userInfo['email'] ?? null;
-
-        return User::firstOrCreate(
-            ['email' => $email],
-            ['name' => $name, 'password' => md5(Str::uuid())]
-        );
-    }
 
     /**
      * Create social identity
@@ -296,22 +202,6 @@ class LoghyController extends Controller
         ]);
     }
 
-    /**
-     * Delete user information in Loghy
-     *
-     * @param string $loghyId
-     * @return bool
-     */
-    private function deleteUserInfo(string $loghyId): bool
-    {
-        try {
-            $response = Loghy::deleteUserInfo($loghyId);
-            return $this->verifyLoghyResponse($response);
-        } catch (\Exception $e) {
-            Log::error("Failed to delete user information in Loghy. Its LoghyID is {$loghyId}");
-            return false;
-        }
-    }
 
     /**
      * Redirect home with login and success message.
@@ -334,9 +224,11 @@ class LoghyController extends Controller
      * @param string $message
      * @return mixed
      */
-    private function failRedirect(string $message)
+    private function failRedirect(string $message, string $route = null)
     {
-        $route = Auth::check() ? 'home' : 'register';
+        if (is_null($route)) {
+            $route = Auth::check() ? 'home' : 'login';
+        }
         return redirect()->route($route)->with('error', $message);
     }
 
