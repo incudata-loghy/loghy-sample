@@ -122,44 +122,6 @@ class LoghyController extends Controller
         }
     }
 
-    // TODO: handleConnectCallback
-    /**
-     * Connect LoghyID.
-     *
-     * @param string $loghyId
-     * @return User
-     * @throws LoghyCallbackHandleException
-     */
-    private function connectUser(string $loghyId, ?string $socialLoginType): User
-    {
-        try {
-            $response = Loghy::getUserInfo($loghyId);
-            $data = $this->verifyLoghyResponse($response);
-
-            $userInfo = $data['personal_data'] ?? null;
-            if (!$userInfo) {
-                throw new LoghyCallbackHandleException('Failed to get personal data.');
-            }
-
-            /** @var User $user */
-            $user = Auth::user();
-
-            $this->createSocialIdentity($user, $loghyId, $socialLoginType, $userInfo);
-
-            $response = Loghy::putUserId($loghyId, $user->id);
-            $this->verifyLoghyResponse($response);
-            return $user;
-        } catch (LoghyCallbackHandleException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new LoghyCallbackHandleException(
-                'Failed to connect User. Error message: ' . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
-    }
-
     /**
      * Register user.
      *
@@ -178,27 +140,6 @@ class LoghyController extends Controller
 
         return $user;
     }
-
-
-    /**
-     * Create social identity
-     *
-     * @param User $user
-     * @param string $loghyId
-     * @param string $type
-     * @param array $userInfo
-     * @return SocialIdentity
-     * @throws LoghyCallbackHandleException
-     */
-    private function createSocialIdentity(User $user, string $loghyId, string $type, array $userInfo): SocialIdentity
-    {
-        $sub = $userInfo['sid'] ?? throw new LoghyCallbackHandleException('The sub is not found in user information.');
-
-        return $user->socialIdentities()->firstOrCreate([
-            'loghy_id' => $loghyId, 'type' => $type, 'sub' => $sub,
-        ]);
-    }
-
 
     /**
      * Redirect home with login and success message.
@@ -227,17 +168,5 @@ class LoghyController extends Controller
             $route = Auth::check() ? 'home' : 'login';
         }
         return redirect()->route($route)->with('error', $message);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function verifyLoghyResponse(array $response): bool|array
-    {
-        if ($response['result'] === false) {
-            throw new \Exception($response['error_message'], $response['error_code']);
-        }
-
-        return $response['data'] ?? true;
     }
 }
