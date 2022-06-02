@@ -31,8 +31,7 @@ class LoghyController extends Controller
             $loghyUser = Loghy::setCode($code)->user();
             $user = User::findByLoghyUser($loghyUser);
             if (!$user) {
-                Log::info("User not found", ['loghy_user' => $loghyUser]);
-                return $this->failRedirect('User not found.', 'login');
+                return $this->failRedirect('Account not found. Please register.', 'register');
             }
             return $this->successRedirect($user, 'Logged in 🎉');
         } catch (\Exception $e) {
@@ -57,8 +56,8 @@ class LoghyController extends Controller
 
             $loghyUser = Loghy::setCode($code)->user();
 
-            if (User::findByLoghyUser($loghyUser)) {
-                return $this->failRedirect('Already registered. Please login.', 'login');
+            if ($user = User::findByLoghyUser($loghyUser)) {
+                return $this->successRedirect($user, 'Already registered. Logged in 👍');
             }
             $user = $this->registerUser($loghyUser);
 
@@ -130,8 +129,11 @@ class LoghyController extends Controller
     {
         $user = User::createByLoghyUser($loghyUser);
 
-        if (! Loghy::putUserId($user->id, $loghyUser->getLoghyId())) {
-            Log::error("Failed to pu user ID", ['user_id' => $user->id, 'loghy_id' => $loghyUser->getLoghyId()]);
+        try {
+            Loghy::putUserId($user->id, $loghyUser->getLoghyId());
+        } catch (\Exception $e) {
+            Log::error("Failed to put user ID", ['user_id' => $user->id, 'loghy_id' => $loghyUser->getLoghyId()]);
+            throw $e;
         }
 
         return $user;

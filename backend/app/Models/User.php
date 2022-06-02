@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Loghy\SDK\User as LoghyUser;
@@ -118,6 +119,7 @@ class User extends Authenticatable
             'loghy_id' => $loghyUser->getLoghyId(),
             'type' => $loghyUser->getType(),
             'sub' => $loghyUser->getId(),
+            'raw' => $loghyUser->getRaw(),
         ]);
     }
 }

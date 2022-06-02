@@ -44,14 +44,14 @@ it('redirect to register page when request has no code', function () {
         ->assertSessionHas('error', 'Authentication code is not found in callback data.');
 });
 
-it('redirect to login page when already registered', function () {
+it('authenticate when already registered', function () {
     $loghyUser = $this->mockLoghy();
     $user = User::factory()->create(['email' => $loghyUser->getEmail(), 'name' => $loghyUser->getName()]);
     SocialIdentity::factory()->for($user)->create(['loghy_id' => $loghyUser->getLoghyId(), 'type' => $loghyUser->getType(), 'sub' => $loghyUser->getId()]);
 
     call('GET', $this->uri, ['code' => 'xxx'])
-        ->assertRedirect(route('login'))
-        ->assertSessionHas('error', 'Already registered. Please login.');
+        ->assertRedirect(route('home'))
+        ->assertSessionHas('success', 'Already registered. Logged in 👍');
 });
 
 it('redirect to register page when throw exception', function () {
@@ -61,31 +61,3 @@ it('redirect to register page when throw exception', function () {
         ->assertRedirect(route('register'))
         ->assertSessionHas('error', 'Something went wrong...');
 });
-
-// TODO: Create new endpoint for connect, and change beforeURL to it
-// it('redirect to home page when request has no code and authenticated', function () {
-//     /** @var App\Models\User $user */
-//     $user = User::factory()->create();
-//     actingAs($user)->call('GET', $this->uri)
-//         ->assertRedirect(route('home'))
-//         ->assertSessionHas('error', 'Authentication code is not found in callback data.');
-// });
-
-
-
-// function $this->mockLoghy(): LoghyUser
-// {
-//     $loghyUser = (new LoghyUser())->map([
-//         'id' => '__sub__',
-//         'type' => '__type__',
-//         'loghyId' => '__loghy_id__',
-//         'userId' => null,
-//         'name' => '__name__',
-//         'email' => 'email@example.com'
-//     ]);
-
-//     Loghy::shouldReceive('setCode');
-//     Loghy::shouldReceive('user')->andReturn($loghyUser);
-
-//     return $loghyUser;
-// }

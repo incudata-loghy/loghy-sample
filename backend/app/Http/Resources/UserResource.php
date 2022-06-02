@@ -15,11 +15,18 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
+        $identities = [];
+        foreach ($this->socialIdentities as $identity) {
+            $identities[] = [
+                $identity->type => $identity->raw,
+            ];
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            // 'avatar' => 'coming soon...',
+            'identities' => $identities,
         ];
     }
 }

@@ -14,14 +14,16 @@ trait LoghyMockable
         SocialIdentity $identity = null,
         User $user = null
     ): LoghyUser {
-        $loghyUser = (new LoghyUser())->map($attributes + [
-            'id'      => $identity?->sub  ?? '__sub__',
-            'type'    => $identity?->type ?? '__type__',
-            'loghyId' => $identity?->loghy_id ?? '__loghy_id__',
+        $raw = [
             'userId' => is_null($user) ? null : (string)($user->id),
             'name' => '__name__',
             'email' => 'email@example.com'
-        ]);
+        ];
+        $loghyUser = (new LoghyUser())->map($attributes + $raw + [
+            'id'      => $identity?->sub  ?? '__sub__',
+            'type'    => $identity?->type ?? '__type__',
+            'loghyId' => $identity?->loghy_id ?? '__loghy_id__',
+        ])->setRaw($raw);
 
         Loghy::shouldReceive('setCode');
         Loghy::shouldReceive('user')->andReturn($loghyUser);

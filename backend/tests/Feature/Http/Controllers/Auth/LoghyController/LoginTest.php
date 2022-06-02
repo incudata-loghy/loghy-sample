@@ -56,8 +56,8 @@ it('redirect to login page when invalid user is requested', function () {
     ]);
 
     call('GET', $this->uri, ['code' => 'xxx'])
-        ->assertRedirect(route('login'))
-        ->assertSessionHas('error', 'User not found.');
+        ->assertRedirect(route('register'))
+        ->assertSessionHas('error', 'Account not found. Please register.');
 });
 
 it('redirect to login page when throw exception', function () {

@@ -26,6 +26,15 @@ class SocialIdentity extends Model
     protected $guarded = [];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'raw' => 'array',
+    ];
+
+    /**
      * Get the user that owns the Loghy history.
      */
     public function user()
