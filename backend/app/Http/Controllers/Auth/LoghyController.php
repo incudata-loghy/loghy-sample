@@ -2,16 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Exceptions\LoghyCallbackHandleException;
 use App\Facades\Loghy;
 use App\Http\Controllers\Controller;
-use App\Models\SocialIdentity;
 use App\Models\User;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Loghy\SDK\User as LoghyUser;
 
 use function PHPUnit\Framework\assertInstanceOf;
