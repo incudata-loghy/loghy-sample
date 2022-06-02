@@ -26,6 +26,15 @@ class SocialIdentity extends Model
     protected $guarded = [];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'raw' => 'array',
+    ];
+
+    /**
      * Get the user that owns the Loghy history.
      */
     public function user()
@@ -45,8 +54,8 @@ class SocialIdentity extends Model
                 'isLinked' => !is_null($identity),
                 'id' => is_null($identity) ? null : $identity->id,
                 'loginUrl' => "https://api001.sns-loghy.jp/login/type/{$key}/loghySample"
-                    . '?beforeURL=' . urlencode(route('auth.loghy.callback.login'))
-                    . '&registURL=' . urlencode(route('auth.loghy.callback.register'))
+                    . '?beforeURL=' . urlencode(route('auth.loghy.callback.connect'))
+                    . '&registURL=' . urlencode(route('auth.loghy.callback.connect'))
                     . '&errorURL=' . urlencode(route('auth.loghy.callback.error')),
             ];
         }

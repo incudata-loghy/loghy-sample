@@ -18,11 +18,12 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
-        "incudata-loghy/loghy-php": "^0.1.0",
+        "incudata-loghy/loghy-php": "^1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.0",
         "nunomaduro/larastan": "^1.0",
+        "pestphp/pest-plugin-laravel": "^1.2",
         "phpunit/phpunit": "^9.5.10"
     },
     "autoload": {
