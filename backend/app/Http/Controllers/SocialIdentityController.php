@@ -22,7 +22,7 @@ class SocialIdentityController extends Controller
 
     /**
      * Show the application dashboard.
-     * 
+     *
      * @param Request $request
      * @param SocialIdentity $socialIdentity
      *

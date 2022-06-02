@@ -20,7 +20,7 @@ it('delete social identity', function () {
     actingAs($this->user)->delete($this->uri)
         ->assertRedirect(route('home'))
         ->assertSessionHas('success', 'Disconnected ✅');
-    
+
     assertModelMissing($this->socialIdentity);
 });
 
