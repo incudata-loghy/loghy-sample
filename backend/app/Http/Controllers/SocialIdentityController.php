@@ -6,6 +6,7 @@ use App\Facades\Loghy;
 use App\Models\SocialIdentity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SocialIdentityController extends Controller
 {
@@ -22,6 +23,9 @@ class SocialIdentityController extends Controller
     /**
      * Show the application dashboard.
      *
+     * @param Request $request
+     * @param SocialIdentity $socialIdentity
+     *
      * @return mixed
      */
     public function destroy(Request $request, SocialIdentity $socialIdentity)
@@ -32,17 +36,18 @@ class SocialIdentityController extends Controller
             403
         );
 
-        $response = Loghy::deleteUserId($socialIdentity->loghy_id);
-        if ($response['result'] === false) {
-            return redirect()
-                ->route('home')
-                ->with('error', 'Failed to delete user ID. Error message: ' . $response['error_message']);
+        try {
+            Loghy::deleteUser($socialIdentity->loghy_id);
+            $socialIdentity->delete();
+        } catch (\Exception $e) {
+            report($e);
+            Log::error(
+                "Failed to delete user in Loghy",
+                ['user_id' => $userId, 'social_identity_id' => $socialIdentity->id]
+            );
+            return redirect()->route('home')->with('error', 'Failed to disconnect.');
         }
 
-        $socialIdentity->delete();
-
-        return redirect()
-            ->route('home')
-            ->with('success', 'Disconnected ✅');
+        return redirect()->route('home')->with('success', 'Disconnected ✅');
     }
 }

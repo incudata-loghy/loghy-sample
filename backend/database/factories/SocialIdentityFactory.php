@@ -15,7 +15,7 @@ class SocialIdentityFactory extends Factory
     public function definition()
     {
         return [
-            'loghy_id' => $this->faker->unique()->randomNumber(9),
+            'loghy_id' => (string)($this->faker->unique()->randomNumber(9)),
             'type' => 'google',
             'sub' => '11111111111111111111',
         ];

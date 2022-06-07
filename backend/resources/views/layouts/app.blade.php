@@ -12,9 +12,8 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
-    @if(Request::routeIs(['register', 'login', 'home']))
-        @include('components.loghy.button-js')
-    @endif
+    @includeWhen(Request::routeIs('register'), 'components.loghy.button-js', ['callback_url' => route('auth.loghy.callback.register')])
+    @includeWhen(Request::routeIs('login'),    'components.loghy.button-js', ['callback_url' => route('auth.loghy.callback.login')])
 
     @if (Request::routeIs('home'))
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/base16/dracula.min.css">
