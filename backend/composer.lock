@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5051ad6428ef00ac1ce451a6e8f888a6",
+    "content-hash": "b63331711e871d229a141da4677b5465",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1684,6 +1684,49 @@
                 }
             ],
             "time": "2022-03-20T21:55:58+00:00"
+        },
+        {
+            "name": "incudata-loghy/loghy-php",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/incudata-loghy/Loghy-PHP.git",
+                "reference": "21f4afb43cf4f9f0287d5020836ea078891e6f84"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/incudata-loghy/Loghy-PHP/zipball/21f4afb43cf4f9f0287d5020836ea078891e6f84",
+                "reference": "21f4afb43cf4f9f0287d5020836ea078891e6f84",
+                "shasum": ""
+            },
+            "require": {
+                "friendsofphp/php-cs-fixer": "^3.4",
+                "guzzlehttp/guzzle": "^7.4",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "pestphp/pest": "^1.21",
+                "phpstan/phpstan": "^1.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Loghy\\SDK\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "INCUDATA",
+                    "email": "loghy_support@incudata.co.jp"
+                }
+            ],
+            "description": "Loghy PHP SDK.",
+            "support": {
+                "issues": "https://github.com/incudata-loghy/Loghy-PHP/issues",
+                "source": "https://github.com/incudata-loghy/Loghy-PHP/tree/2.1.0"
+            },
+            "time": "2022-09-16T14:25:26+00:00"
         },
         {
             "name": "laravel/framework",
@@ -7149,49 +7192,6 @@
             "time": "2020-07-09T08:09:16+00:00"
         },
         {
-            "name": "incudata-loghy/loghy-php",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/incudata-loghy/Loghy-PHP.git",
-                "reference": "f6fb3a7da3942edc7535b0623df8fbae56234891"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/incudata-loghy/Loghy-PHP/zipball/f6fb3a7da3942edc7535b0623df8fbae56234891",
-                "reference": "f6fb3a7da3942edc7535b0623df8fbae56234891",
-                "shasum": ""
-            },
-            "require": {
-                "friendsofphp/php-cs-fixer": "^3.4",
-                "guzzlehttp/guzzle": "^7.4",
-                "php": "^8.0"
-            },
-            "require-dev": {
-                "pestphp/pest": "^1.21",
-                "phpstan/phpstan": "^1.6"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Loghy\\SDK\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "INCUDATA",
-                    "email": "loghy_support@incudata.co.jp"
-                }
-            ],
-            "description": "Loghy PHP SDK.",
-            "support": {
-                "issues": "https://github.com/incudata-loghy/Loghy-PHP/issues",
-                "source": "https://github.com/incudata-loghy/Loghy-PHP/tree/1.0.2"
-            },
-            "time": "2022-05-30T06:00:48+00:00"
-        },
-        {
             "name": "justinrainbow/json-schema",
             "version": "5.2.11",
             "source": {
@@ -9899,5 +9899,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.1.0"
 }

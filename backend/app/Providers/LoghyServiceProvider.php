@@ -14,10 +14,8 @@ class LoghyServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(\Loghy\SDK\Loghy::class, function () {
-            return new \Loghy\SDK\Loghy(
-                config('loghy.api_key'),
-                config('loghy.site_code'),
-            );
+            return (new \Loghy\SDK\Loghy(config('loghy.site_code')))
+                ->setSiteAccessToken(config('loghy.access_token'));
         });
     }
 
