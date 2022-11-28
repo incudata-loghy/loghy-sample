@@ -10,6 +10,7 @@
         "friendsofphp/php-cs-fixer": "^3.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "incudata-loghy/loghy-php": "^2.1",
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
@@ -18,7 +19,6 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
-        "incudata-loghy/loghy-php": "^1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.0",
